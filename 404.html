@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Membuka HiFi [HI-RES]...</title>
+  <script>
+    (function() {
+      const path = window.location.pathname.replace(/^\/HiFi-web/, "");
+      const search = window.location.search || "";
+      if (path.startsWith("/app/")) {
+        const sub = path.replace(/^\/app\//, "");
+        window.location.href = "HiFi://" + sub + search;
+      }
+    })();
+  </script>
+  <meta http-equiv="refresh" content="2;url=/HiFi-web/" />
+</head>
+<body style="background:#0b0d12;color:#f3f5f8;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;">
+  <div>
+    <h2>Mengarahkan ke Aplikasi HiFi...</h2>
+    <p style="margin-top:12px;"><a href="/HiFi-web/" style="color:#7cc4fa;">Klik di sini jika belum memiliki aplikasi HiFi</a></p>
+  </div>
+</body>
+</html>
