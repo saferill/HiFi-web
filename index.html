@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HiFi [HI-RES] — High-Resolution Music Player</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --card: #141821;
+      --border: #232a3a;
+      --primary: #7cc4fa;
+      --primary-bg: #16324f;
+      --text: #f3f5f8;
+      --muted: #9aa3b5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .container { max-width: 560px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 36px 28px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .brand h1 { font-size: 2.2rem; font-weight: 900; color: var(--primary); letter-spacing: -0.03em; }
+    .badge { background: var(--primary-bg); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; letter-spacing: 0.06em; }
+    p.sub { color: var(--muted); line-height: 1.6; margin-bottom: 28px; font-size: 0.98rem; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 16px 22px; background: var(--primary); color: #061320; font-weight: 800; font-size: 1rem; border-radius: 14px; text-decoration: none; transition: transform 0.15s ease, opacity 0.15s ease; margin-bottom: 12px; }
+    .btn:hover { transform: translateY(-1px); opacity: 0.94; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); font-weight: 600; }
+    .meta { font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
+    #deeplink-box { display: none; margin-bottom: 24px; padding: 16px; border-radius: 14px; background: rgba(124, 196, 250, 0.08); border: 1px solid rgba(124, 196, 250, 0.25); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <h1>HiFi</h1>
+      <span class="badge">HI-RES</span>
+    </div>
+    <p class="sub">Pemutar musik bebas iklan dengan lirik sinkronisasi, terjemahan pintar, Live Radio, dan kualitas audio jernih.</p>
+
+    <div id="deeplink-box">
+      <p style="margin-bottom:12px;font-weight:700;">Membuka konten di aplikasi HiFi...</p>
+      <a id="open-app-btn" class="btn" href="#">Buka di Aplikasi HiFi</a>
+    </div>
+
+    <a id="download-btn" class="btn" href="https://github.com/saferill/HiFi/releases/latest">
+      Unduh APK Terbaru (Otomatis Sesuai HP)
+    </a>
+    <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases">
+      Lihat Semua Versi di GitHub Releases
+    </a>
+    <div id="version-info" class="meta">Mendeteksi versi terbaru & arsitektur perangkat...</div>
+  </div>
+
+  <script>
+    (async function() {
+      const ua = navigator.userAgent.toLowerCase();
+      let abi = "arm64-v8a";
+      if (ua.includes("x86_64") || ua.includes("amd64")) abi = "x86_64";
+      else if (ua.includes("armeabi") || ua.includes("armv7")) abi = "armeabi-v7a";
+
+      const btn = document.getElementById("download-btn");
+      const info = document.getElementById("version-info");
+      try {
+        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases/latest");
+        if (res.ok) {
+          const data = await res.json();
+          const tag = data.tag_name || "";
+          const asset = (data.assets || []).find(a => a.name.includes(abi) && a.name.endsWith(".apk"))
+                     || (data.assets || []).find(a => a.name.includes("universal") && a.name.endsWith(".apk"))
+                     || (data.assets || []).find(a => a.name.endsWith(".apk"));
+          if (asset) {
+            btn.href = asset.browser_download_url;
+            btn.textContent = `Unduh HiFi ${tag} (${abi})`;
+            info.textContent = `Versi terbaru: ${tag} • Otomatis dipilih untuk ${abi}`;
+          }
+        }
+      } catch (e) {
+        btn.href = `https://github.com/saferill/HiFi/releases/latest/download/HiFi-foss-androidApp-${abi}-release.apk`;
+        info.textContent = `Arsitektur terdeteksi: ${abi}`;
+      }
+    })();
+  </script>
+</body>
+</html>
