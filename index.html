@@ -1310,7 +1310,7 @@
       });
 
       try {
-        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases?per_page=3");
+        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases?per_page=5");
         if (!res.ok) throw new Error("GitHub API error");
         const releases = await res.json();
         const latest = releases[0];
@@ -1339,26 +1339,31 @@
             if (match) p.href = match.browser_download_url;
           });
 
-          // Desktop assets check
-          const desktopAssets = assets.filter(a => /\.(exe|msi|dmg|appimage|deb|rpm)$/i.test(a.name));
-          if (desktopAssets.length > 0) {
+          // Desktop assets check across recent releases
+          const isDesktopAsset = (a) => /\.(exe|msi|dmg|appimage|deb|rpm)$/i.test(a.name);
+          const desktopRelease = releases.find(r => (r.assets || []).some(isDesktopAsset));
+          if (desktopRelease) {
+            const desktopAssets = desktopRelease.assets.filter(isDesktopAsset);
+            const dTag = desktopRelease.tag_name || "";
+            const isOlder = dTag !== tag;
             desktopStatus.innerHTML = currentLang === "id"
-              ? `Installer Desktop tersedia untuk rilis <strong>${escapeHtml(tag)}</strong>:`
-              : `Desktop installers available for <strong>${escapeHtml(tag)}</strong>:`;
-            const links = desktopAssets.map(a =>
-              `<a class="btn btn-primary" href="${a.browser_download_url}">${escapeHtml(a.name)}</a>`
-            ).join("");
+              ? `Installer Desktop tersedia pada rilis <strong>${escapeHtml(dTag)}</strong>${isOlder ? ` (rilis ${escapeHtml(tag)} khusus Android)` : ""}:`
+              : `Desktop installer available on <strong>${escapeHtml(dTag)}</strong>${isOlder ? ` (${escapeHtml(tag)} is Android-only)` : ""}:`;
+            const links = desktopAssets.map(a => {
+              const sizeMb = (a.size / (1024 * 1024)).toFixed(1);
+              return `<a class="btn btn-primary" href="${a.browser_download_url}">${escapeHtml(a.name)} (${sizeMb} MB)</a>`;
+            }).join("");
             desktopActions.innerHTML = links + desktopActions.innerHTML;
           } else {
             desktopStatus.innerHTML = currentLang === "id"
-              ? `Rilis <strong>${escapeHtml(tag)}</strong> saat ini menyediakan APK Android. Untuk Desktop (Windows / macOS / Linux), jalankan via Gradle: <code>./gradlew :composeApp:run</code>`
-              : `Release <strong>${escapeHtml(tag)}</strong> currently ships Android APKs. For Desktop (Windows / macOS / Linux), run from source with <code>./gradlew :composeApp:run</code>`;
+              ? `Belum ada installer Desktop di rilis terbaru. Jalankan dari source via Gradle: <code>./gradlew :composeApp:run</code>`
+              : `No Desktop installer in recent releases yet. Run from source via Gradle: <code>./gradlew :composeApp:run</code>`;
           }
         }
 
-        // Render Changelog cards
+        // Render Changelog cards (latest 3)
         if (releases.length > 0) {
-          changelogGrid.innerHTML = releases.map((rel, idx) => {
+          changelogGrid.innerHTML = releases.slice(0, 3).map((rel, idx) => {
             const dateStr = rel.published_at
               ? new Date(rel.published_at).toLocaleDateString(currentLang === "id" ? "id-ID" : "en-US", { year: "numeric", month: "short", day: "numeric" })
               : "";
