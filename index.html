@@ -6,6 +6,15 @@
   <title>HiFi [HI-RES] — Pemutar Musik Open-Source Tanpa Iklan</title>
   <meta name="description" content="HiFi adalah pemutar musik open-source bebas iklan untuk Android & Desktop dengan audio jernih, lirik sinkronisasi, Live Radio 24/7, dan Tangga Lagu 100+ negara." />
   <meta name="theme-color" content="#080a0f" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://saferill.github.io/HiFi-web/" />
+  <meta property="og:title" content="HiFi [HI-RES] — Pemutar Musik Open-Source Tanpa Iklan" />
+  <meta property="og:description" content="Streaming musik bebas iklan untuk Android & Desktop dengan lirik sinkronisasi, Live Radio 24/7, dan Tangga Lagu 100+ negara." />
+  <meta property="og:image" content="https://saferill.github.io/HiFi-web/assets/banner.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HiFi [HI-RES] — Pemutar Musik Open-Source Tanpa Iklan" />
+  <meta name="twitter:description" content="Streaming musik bebas iklan untuk Android & Desktop dengan lirik sinkronisasi, Live Radio 24/7, dan Tangga Lagu 100+ negara." />
+  <meta name="twitter:image" content="https://saferill.github.io/HiFi-web/assets/banner.png" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <style>
     :root {
@@ -581,10 +590,176 @@
     .footer-links { display: flex; flex-wrap: wrap; gap: 18px; }
     .footer-links a:hover { color: var(--primary); }
 
+    /* Platform Tabs (Android / Desktop) */
+    .platform-tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 5px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      margin-bottom: 16px;
+    }
+    .platform-tab {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .platform-tab.active {
+      background: var(--primary-bg);
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px rgba(124, 196, 250, 0.3);
+    }
+    .platform-panel { display: none; }
+    .platform-panel.active { display: block; }
+    .desktop-note {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .desktop-note code {
+      background: var(--bg-elev);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+    }
+
+    /* Changelog */
+    .changelog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .release-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .release-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .release-tag {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--primary);
+    }
+    .release-date {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .release-notes {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.55;
+      max-height: 170px;
+      overflow-y: auto;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+    }
+    .release-notes ul { padding-left: 18px; margin: 4px 0; }
+    .release-notes li { margin-bottom: 4px; }
+    .release-link {
+      margin-top: auto;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Install Guide & Privacy */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+    }
+    .info-card h3 { font-size: 1.15rem; font-weight: 900; margin-bottom: 12px; }
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .step-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .privacy-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .privacy-points li::before {
+      content: "✓ ";
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    /* Community & Support */
+    .community-bar {
+      background: linear-gradient(135deg, rgba(124, 196, 250, 0.1), rgba(52, 211, 153, 0.07));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .community-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; padding-top: 30px; gap: 32px; }
       .phone-frame { max-width: 260px; }
-      .grid-3 { grid-template-columns: 1fr; }
+      .grid-3, .changelog-grid, .info-grid { grid-template-columns: 1fr; }
       .explorer-grid { grid-template-columns: 1fr; }
       .stats { grid-template-columns: repeat(2, 1fr); }
       .nav-links { display: none; }
@@ -602,7 +777,8 @@
         <a href="#preview" data-i18n="nav_preview">Tampilan</a>
         <a href="#features" data-i18n="nav_features">Fitur</a>
         <a href="#explorer" data-i18n="nav_live">Radio &amp; Chart</a>
-        <a href="#download" data-i18n="nav_download">Unduh</a>
+        <a href="#changelog" data-i18n="nav_changelog">Rilis</a>
+        <a href="#privacy" data-i18n="nav_privacy">Privasi</a>
         <a href="#faq" data-i18n="nav_faq">FAQ</a>
       </div>
       <div class="nav-actions">
@@ -630,21 +806,42 @@
           <a id="open-app-btn" class="btn btn-primary" href="#" data-i18n="deeplink_btn">Buka di Aplikasi HiFi</a>
         </div>
 
-        <div class="cta-group">
-          <a id="download-btn" class="btn btn-primary" href="https://github.com/saferill/HiFi/releases/latest">
-            Unduh APK Terbaru (Otomatis Sesuai HP)
-          </a>
-          <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener" data-i18n="all_releases">
-            Semua Rilis
-          </a>
+        <div class="platform-tabs" role="tablist">
+          <button class="platform-tab active" type="button" data-platform="android" data-i18n="tab_android">📱 Android (APK)</button>
+          <button class="platform-tab" type="button" data-platform="desktop" data-i18n="tab_desktop">💻 Desktop</button>
         </div>
-        <div id="version-info" class="version-info">Mendeteksi versi terbaru &amp; arsitektur perangkat...</div>
 
-        <div class="abi-pills" id="abi-pills">
-          <a class="abi-pill" data-abi="arm64-v8a" href="https://github.com/saferill/HiFi/releases/latest">arm64-v8a (Modern)</a>
-          <a class="abi-pill" data-abi="armeabi-v7a" href="https://github.com/saferill/HiFi/releases/latest">armeabi-v7a (32-bit)</a>
-          <a class="abi-pill" data-abi="x86_64" href="https://github.com/saferill/HiFi/releases/latest">x86_64</a>
-          <a class="abi-pill" data-abi="universal" href="https://github.com/saferill/HiFi/releases/latest">Universal APK</a>
+        <div class="platform-panel active" id="panel-android">
+          <div class="cta-group">
+            <a id="download-btn" class="btn btn-primary" href="https://github.com/saferill/HiFi/releases/latest">
+              Unduh APK Terbaru (Otomatis Sesuai HP)
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener" data-i18n="all_releases">
+              Semua Rilis
+            </a>
+          </div>
+          <div id="version-info" class="version-info">Mendeteksi versi terbaru &amp; arsitektur perangkat...</div>
+
+          <div class="abi-pills" id="abi-pills">
+            <a class="abi-pill" data-abi="arm64-v8a" href="https://github.com/saferill/HiFi/releases/latest">arm64-v8a (Modern)</a>
+            <a class="abi-pill" data-abi="armeabi-v7a" href="https://github.com/saferill/HiFi/releases/latest">armeabi-v7a (32-bit)</a>
+            <a class="abi-pill" data-abi="x86_64" href="https://github.com/saferill/HiFi/releases/latest">x86_64</a>
+            <a class="abi-pill" data-abi="universal" href="https://github.com/saferill/HiFi/releases/latest">Universal APK</a>
+          </div>
+        </div>
+
+        <div class="platform-panel" id="panel-desktop">
+          <div class="desktop-note" id="desktop-status" data-i18n="desktop_checking">
+            Memeriksa installer Desktop (Windows / macOS / Linux) di rilis terbaru...
+          </div>
+          <div class="cta-group" id="desktop-actions">
+            <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener" data-i18n="all_releases">
+              Semua Rilis
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/saferill/HiFi#build" target="_blank" rel="noopener" data-i18n="desktop_build_btn">
+              Panduan Build dari Source
+            </a>
+          </div>
         </div>
       </div>
 
@@ -763,6 +960,44 @@
       </div>
     </section>
 
+    <!-- Changelog / What's New -->
+    <section class="section" id="changelog">
+      <div class="sec-head">
+        <h2 data-i18n="chg_heading">Riwayat Rilis &amp; Pembaruan Terbaru</h2>
+        <p data-i18n="chg_sub">Catatan rilis dimuat otomatis dari GitHub Releases resmi saferill/HiFi.</p>
+      </div>
+      <div class="changelog-grid" id="changelog-grid">
+        <div class="release-card"><div class="release-tag">Memuat rilis terbaru...</div></div>
+      </div>
+    </section>
+
+    <!-- Install Guide & Privacy Policy -->
+    <section class="section" id="privacy">
+      <div class="sec-head">
+        <h2 data-i18n="gp_heading">Panduan Instalasi &amp; Kebijakan Privasi</h2>
+        <p data-i18n="gp_sub">Langkah cepat memasang APK di Android dan komitmen transparansi privasi HiFi Music.</p>
+      </div>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3 data-i18n="guide_title">📲 Cara Pasang APK di Android</h3>
+          <ol class="step-list">
+            <li><span class="step-num">1</span><span data-i18n="step_1">Klik tombol Unduh di atas untuk mengunduh file APK yang sesuai dengan arsitektur HP kamu.</span></li>
+            <li><span class="step-num">2</span><span data-i18n="step_2">Buka file APK yang sudah terunduh, lalu aktifkan izin <strong>"Install from Unknown Sources"</strong> jika diminta sistem Android.</span></li>
+            <li><span class="step-num">3</span><span data-i18n="step_3">Tunggu proses instalasi selesai, buka HiFi, dan langsung nikmati musik tanpa iklan atau login wajib.</span></li>
+          </ol>
+        </div>
+        <div class="info-card">
+          <h3 data-i18n="priv_title">🔒 Kebijakan Privasi (Privacy Policy)</h3>
+          <ul class="privacy-points">
+            <li data-i18n="priv_1">Tanpa pelacak iklan, analytics pihak ketiga, atau pengumpulan data pribadi.</li>
+            <li data-i18n="priv_2">Riwayat putar, daftar putar lokal, dan cache lagu disimpan sepenuhnya di perangkat kamu.</li>
+            <li data-i18n="priv_3">Aplikasi hanya terhubung ke layanan pemutaran, lirik (LRCLIB/HiFi-lyrics), SponsorBlock, dan konfigurasi GitHub HiFi.</li>
+            <li data-i18n="priv_4">100% kode sumber terbuka (GPL-3.0) dan dapat diaudit siapa saja di GitHub.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section class="section" id="faq">
       <div class="sec-head">
@@ -785,6 +1020,20 @@
           <summary data-i18n="q4">Bagaimana jika radio live atau tangga lagu bermasalah?</summary>
           <p data-i18n="a4">Bot otomatis di GitHub Actions mengecek dan menyembuhkan link radio serta tangga lagu setiap 2 jam sekali. Cukup tutup dan buka ulang aplikasi untuk menyegarkan cache.</p>
         </details>
+      </div>
+    </section>
+    <!-- Community & Support -->
+    <section class="section" style="padding-top:16px;">
+      <div class="community-bar">
+        <div>
+          <h3 style="font-size:1.25rem;font-weight:900;margin-bottom:4px;" data-i18n="comm_title">Butuh Bantuan, Lapor Bug, atau Request Fitur?</h3>
+          <p style="color:var(--muted);font-size:0.92rem;" data-i18n="comm_sub">Ikut berkontribusi, beri bintang di GitHub, atau laporkan kendala langsung ke developer.</p>
+        </div>
+        <div class="community-actions">
+          <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/issues/new/choose" target="_blank" rel="noopener" data-i18n="comm_bug">🐞 Lapor Bug / Fitur</a>
+          <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/discussions" target="_blank" rel="noopener" data-i18n="comm_disc">💬 Diskusi</a>
+          <a class="btn btn-primary" style="flex:0 0 auto;" href="https://github.com/saferill/HiFi" target="_blank" rel="noopener" data-i18n="comm_star">⭐ Star di GitHub</a>
+        </div>
       </div>
     </section>
   </main>
@@ -820,8 +1069,13 @@
         nav_preview: "Tampilan",
         nav_features: "Fitur",
         nav_live: "Radio & Chart",
-        nav_download: "Unduh",
+        nav_changelog: "Rilis",
+        nav_privacy: "Privasi",
         nav_faq: "FAQ",
+        tab_android: "📱 Android (APK)",
+        tab_desktop: "💻 Desktop",
+        desktop_checking: "Memeriksa installer Desktop (Windows / macOS / Linux) di rilis terbaru...",
+        desktop_build_btn: "Panduan Build dari Source",
         hero_pill: "Open-Source (GPL-3.0) • Bebas Iklan • F-Droid Pending",
         hero_title: 'Streaming Musik <span>Hi-Res</span> Tanpa Iklan &amp; Batas.',
         hero_desc: "Pemutar musik modern untuk Android & Desktop dengan lirik sinkronisasi real-time, terjemahan AI, Radio Live 24/7, dan Tangga Lagu 100+ negara.",
@@ -852,6 +1106,24 @@
         exp_sub: "Data di bawah dimuat langsung dari ekosistem GitHub HiFi yang diperbarui otomatis setiap 2 jam.",
         exp_radio_t: "📻 Radio Live 24/7",
         exp_chart_t: "📈 Tangga Lagu HiFi",
+        chg_heading: "Riwayat Rilis & Pembaruan Terbaru",
+        chg_sub: "Catatan rilis dimuat otomatis dari GitHub Releases resmi saferill/HiFi.",
+        gp_heading: "Panduan Instalasi & Kebijakan Privasi",
+        gp_sub: "Langkah cepat memasang APK di Android dan komitmen transparansi privasi HiFi Music.",
+        guide_title: "📲 Cara Pasang APK di Android",
+        step_1: "Klik tombol Unduh di atas untuk mengunduh file APK yang sesuai dengan arsitektur HP kamu.",
+        step_2: 'Buka file APK yang sudah terunduh, lalu aktifkan izin <strong>"Install from Unknown Sources"</strong> jika diminta sistem Android.',
+        step_3: "Tunggu proses instalasi selesai, buka HiFi, dan langsung nikmati musik tanpa iklan atau login wajib.",
+        priv_title: "🔒 Kebijakan Privasi (Privacy Policy)",
+        priv_1: "Tanpa pelacak iklan, analytics pihak ketiga, atau pengumpulan data pribadi.",
+        priv_2: "Riwayat putar, daftar putar lokal, dan cache lagu disimpan sepenuhnya di perangkat kamu.",
+        priv_3: "Aplikasi hanya terhubung ke layanan pemutaran, lirik (LRCLIB/HiFi-lyrics), SponsorBlock, dan konfigurasi GitHub HiFi.",
+        priv_4: "100% kode sumber terbuka (GPL-3.0) dan dapat diaudit siapa saja di GitHub.",
+        comm_title: "Butuh Bantuan, Lapor Bug, atau Request Fitur?",
+        comm_sub: "Ikut berkontribusi, beri bintang di GitHub, atau laporkan kendala langsung ke developer.",
+        comm_bug: "🐞 Lapor Bug / Fitur",
+        comm_disc: "💬 Diskusi",
+        comm_star: "⭐ Star di GitHub",
         faq_heading: "Pertanyaan yang Sering Diajukan",
         q1: "Apakah HiFi gratis dan bebas iklan?",
         a1: "Ya, HiFi 100% gratis, open-source (GPL-3.0), dan tidak memiliki iklan banner, pop-up iklan, maupun pelacak komersial.",
@@ -866,8 +1138,13 @@
         nav_preview: "Preview",
         nav_features: "Features",
         nav_live: "Radio & Charts",
-        nav_download: "Download",
+        nav_changelog: "Releases",
+        nav_privacy: "Privacy",
         nav_faq: "FAQ",
+        tab_android: "📱 Android (APK)",
+        tab_desktop: "💻 Desktop",
+        desktop_checking: "Checking Desktop installers (Windows / macOS / Linux) in latest release...",
+        desktop_build_btn: "Build from Source Guide",
         hero_pill: "Open-Source (GPL-3.0) • Ad-Free • F-Droid Pending",
         hero_title: 'Ad-Free <span>Hi-Res</span> Music Streaming Without Limits.',
         hero_desc: "Modern open-source music player for Android & Desktop with real-time synced lyrics, smart translation, 24/7 Live Radio, and 100+ country charts.",
@@ -898,6 +1175,24 @@
         exp_sub: "Loaded live from HiFi's GitHub ecosystem, automatically synchronized every 2 hours.",
         exp_radio_t: "📻 24/7 Live Radio",
         exp_chart_t: "📈 HiFi Music Charts",
+        chg_heading: "Latest Releases &amp; Changelog",
+        chg_sub: "Release notes fetched automatically from official saferill/HiFi GitHub Releases.",
+        gp_heading: "Installation Guide &amp; Privacy Policy",
+        gp_sub: "Quick steps to install the Android APK and HiFi Music's privacy commitment.",
+        guide_title: "📲 How to Install APK on Android",
+        step_1: "Tap the Download button above to get the APK matched to your device architecture.",
+        step_2: 'Open the downloaded APK and allow <strong>"Install from Unknown Sources"</strong> when prompted by Android.',
+        step_3: "Wait for installation to finish, launch HiFi, and enjoy ad-free music with no mandatory login.",
+        priv_title: "🔒 Privacy Policy",
+        priv_1: "Zero ad trackers, third-party analytics, or personal data collection.",
+        priv_2: "Playback history, local playlists, and song cache stay strictly on your device.",
+        priv_3: "The app only connects to playback, lyrics (LRCLIB/HiFi-lyrics), SponsorBlock, and HiFi GitHub config endpoints.",
+        priv_4: "100% open-source (GPL-3.0) and publicly auditable on GitHub.",
+        comm_title: "Need Help, Report a Bug, or Request a Feature?",
+        comm_sub: "Contribute, star the repository on GitHub, or report issues directly to the developer.",
+        comm_bug: "🐞 Report Bug / Feature",
+        comm_disc: "💬 Discussions",
+        comm_star: "⭐ Star on GitHub",
         faq_heading: "Frequently Asked Questions",
         q1: "Is HiFi completely free and ad-free?",
         a1: "Yes. HiFi is 100% free, open-source (GPL-3.0), with zero banner ads, ad pop-ups, or commercial trackers.",
@@ -966,7 +1261,37 @@
       if (e.key === "ArrowRight") openShot(activeShot + 1);
     });
 
-    // Smart 1-Click APK Downloader + Architecture Pills
+    // Platform Tabs (Android / Desktop)
+    document.querySelectorAll(".platform-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.platform;
+        document.querySelectorAll(".platform-tab").forEach(t => t.classList.toggle("active", t === tab));
+        document.querySelectorAll(".platform-panel").forEach(p => p.classList.toggle("active", p.id === `panel-${target}`));
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function formatReleaseBody(body) {
+      const lines = escapeHtml(body || "Pembaruan performa dan perbaikan bug.")
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+      const items = lines.map(l => {
+        const clean = l.replace(/^[-*•]\s+/, "").replace(/^#+\s+/, "");
+        return `<li>${clean}</li>`;
+      }).join("");
+      return `<ul>${items}</ul>`;
+    }
+
+    // Unified GitHub Releases Fetch (Android APK + Desktop + Changelog)
     (async function () {
       const ua = navigator.userAgent.toLowerCase();
       let abi = "arm64-v8a";
@@ -976,17 +1301,23 @@
       const btn = document.getElementById("download-btn");
       const info = document.getElementById("version-info");
       const pills = document.querySelectorAll(".abi-pill");
+      const desktopStatus = document.getElementById("desktop-status");
+      const desktopActions = document.getElementById("desktop-actions");
+      const changelogGrid = document.getElementById("changelog-grid");
 
       pills.forEach(p => {
         if (p.dataset.abi === abi) p.classList.add("active");
       });
 
       try {
-        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases/latest");
-        if (res.ok) {
-          const data = await res.json();
-          const tag = data.tag_name || "";
-          const assets = data.assets || [];
+        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases?per_page=3");
+        if (!res.ok) throw new Error("GitHub API error");
+        const releases = await res.json();
+        const latest = releases[0];
+
+        if (latest) {
+          const tag = latest.tag_name || "";
+          const assets = latest.assets || [];
           const findApk = (arch) =>
             assets.find(a => a.name.includes(arch) && a.name.endsWith(".apk")) ||
             assets.find(a => a.name.includes("universal") && a.name.endsWith(".apk")) ||
@@ -1007,10 +1338,48 @@
             const match = findApk(p.dataset.abi);
             if (match) p.href = match.browser_download_url;
           });
+
+          // Desktop assets check
+          const desktopAssets = assets.filter(a => /\.(exe|msi|dmg|appimage|deb|rpm)$/i.test(a.name));
+          if (desktopAssets.length > 0) {
+            desktopStatus.innerHTML = currentLang === "id"
+              ? `Installer Desktop tersedia untuk rilis <strong>${escapeHtml(tag)}</strong>:`
+              : `Desktop installers available for <strong>${escapeHtml(tag)}</strong>:`;
+            const links = desktopAssets.map(a =>
+              `<a class="btn btn-primary" href="${a.browser_download_url}">${escapeHtml(a.name)}</a>`
+            ).join("");
+            desktopActions.innerHTML = links + desktopActions.innerHTML;
+          } else {
+            desktopStatus.innerHTML = currentLang === "id"
+              ? `Rilis <strong>${escapeHtml(tag)}</strong> saat ini menyediakan APK Android. Untuk Desktop (Windows / macOS / Linux), jalankan via Gradle: <code>./gradlew :composeApp:run</code>`
+              : `Release <strong>${escapeHtml(tag)}</strong> currently ships Android APKs. For Desktop (Windows / macOS / Linux), run from source with <code>./gradlew :composeApp:run</code>`;
+          }
+        }
+
+        // Render Changelog cards
+        if (releases.length > 0) {
+          changelogGrid.innerHTML = releases.map((rel, idx) => {
+            const dateStr = rel.published_at
+              ? new Date(rel.published_at).toLocaleDateString(currentLang === "id" ? "id-ID" : "en-US", { year: "numeric", month: "short", day: "numeric" })
+              : "";
+            return `
+              <article class="release-card">
+                <div class="release-head">
+                  <span class="release-tag">${escapeHtml(rel.tag_name)}</span>
+                  ${idx === 0 ? '<span class="live-pill">LATEST</span>' : `<span class="release-date">${dateStr}</span>`}
+                </div>
+                <div class="release-notes">${formatReleaseBody(rel.body)}</div>
+                <a class="release-link" href="${rel.html_url}" target="_blank" rel="noopener">
+                  ${currentLang === "id" ? "Lihat detail di GitHub →" : "View release on GitHub →"}
+                </a>
+              </article>
+            `;
+          }).join("");
         }
       } catch (e) {
-        btn.href = `https://github.com/saferill/HiFi/releases/latest/download/HiFi-foss-androidApp-${abi}-release.apk`;
+        btn.href = `https://github.com/saferill/HiFi/releases/latest/download/androidApp-${abi}-release.apk`;
         info.textContent = `Arsitektur terdeteksi: ${abi}`;
+        changelogGrid.innerHTML = `<div class="release-card"><a class="release-link" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener">Buka GitHub Releases →</a></div>`;
       }
     })();
 
