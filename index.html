@@ -3,55 +3,779 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiFi [HI-RES] — High-Resolution Music Player</title>
+  <title>HiFi [HI-RES] — Pemutar Musik Open-Source Tanpa Iklan</title>
+  <meta name="description" content="HiFi adalah pemutar musik open-source bebas iklan untuk Android & Desktop dengan audio jernih, lirik sinkronisasi, Live Radio 24/7, dan Tangga Lagu 100+ negara." />
+  <meta name="theme-color" content="#0b0d12" />
   <style>
     :root {
-      --bg: #0b0d12;
-      --card: #141821;
-      --border: #232a3a;
+      --bg: #080a0f;
+      --bg-elev: #10141d;
+      --card: #141925;
+      --card-hover: #192030;
+      --border: #222a3a;
       --primary: #7cc4fa;
-      --primary-bg: #16324f;
+      --primary-strong: #4ea8f5;
+      --primary-bg: rgba(124, 196, 250, 0.12);
+      --accent: #34d399;
+      --accent-bg: rgba(52, 211, 153, 0.12);
       --text: #f3f5f8;
-      --muted: #9aa3b5;
+      --muted: #98a2b3;
+      --radius: 18px;
+      --max-w: 1120px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-    .container { max-width: 560px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 36px 28px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
-    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .brand h1 { font-size: 2.2rem; font-weight: 900; color: var(--primary); letter-spacing: -0.03em; }
-    .badge { background: var(--primary-bg); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; letter-spacing: 0.06em; }
-    p.sub { color: var(--muted); line-height: 1.6; margin-bottom: 28px; font-size: 0.98rem; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 16px 22px; background: var(--primary); color: #061320; font-weight: 800; font-size: 1rem; border-radius: 14px; text-decoration: none; transition: transform 0.15s ease, opacity 0.15s ease; margin-bottom: 12px; }
-    .btn:hover { transform: translateY(-1px); opacity: 0.94; }
-    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); font-weight: 600; }
-    .meta { font-size: 0.82rem; color: var(--muted); margin-top: 16px; }
-    #deeplink-box { display: none; margin-bottom: 24px; padding: 16px; border-radius: 14px; background: rgba(124, 196, 250, 0.08); border: 1px solid rgba(124, 196, 250, 0.25); }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(124, 196, 250, 0.14), transparent 60%),
+        radial-gradient(700px 450px at 90% 10%, rgba(52, 211, 153, 0.08), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Navbar */
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(8, 10, 15, 0.8);
+      border-bottom: 1px solid rgba(34, 42, 58, 0.7);
+    }
+    .nav {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+    }
+    .badge {
+      background: var(--primary-bg);
+      color: var(--primary);
+      border: 1px solid rgba(124, 196, 250, 0.25);
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 7px;
+      letter-spacing: 0.07em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lang-btn {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lang-btn:hover { border-color: var(--primary); }
+    .nav-cta {
+      background: var(--primary);
+      color: #061320;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* Layout */
+    .section {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 64px 20px;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: center;
+      padding-top: 52px;
+      padding-bottom: 56px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+    .hero h1 {
+      font-size: clamp(2.1rem, 4.2vw, 3.35rem);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--primary); }
+    .hero p.lead {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 560px;
+      margin-bottom: 26px;
+    }
+
+    #deeplink-box {
+      display: none;
+      margin-bottom: 20px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--primary-bg);
+      border: 1px solid rgba(124, 196, 250, 0.3);
+    }
+
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 22px;
+      border-radius: 13px;
+      font-weight: 800;
+      font-size: 0.96rem;
+      transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+    .btn-primary {
+      background: var(--primary);
+      color: #061320;
+      flex: 1 1 250px;
+    }
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--primary); }
+    .version-info {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .abi-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .abi-pill {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 9px;
+      transition: all 0.15s ease;
+    }
+    .abi-pill:hover, .abi-pill.active {
+      color: var(--primary);
+      border-color: rgba(124, 196, 250, 0.5);
+      background: var(--primary-bg);
+    }
+
+    /* Player Mockup Card */
+    .mockup {
+      background: linear-gradient(160deg, #171e2e 0%, #10141d 100%);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 24px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+    }
+    .mockup-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .hires-tag {
+      color: var(--primary);
+      background: var(--primary-bg);
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.06em;
+    }
+    .cover-art {
+      aspect-ratio: 16 / 10;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 25% 30%, rgba(124, 196, 250, 0.35), transparent 55%),
+        radial-gradient(circle at 80% 75%, rgba(52, 211, 153, 0.25), transparent 55%),
+        #0b0f18;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .eq-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 36px;
+      margin-bottom: 12px;
+    }
+    .eq-bars span {
+      width: 5px;
+      border-radius: 4px;
+      background: var(--primary);
+      animation: eq 1.1s ease-in-out infinite alternate;
+    }
+    .eq-bars span:nth-child(2) { height: 32px; animation-delay: 0.2s; }
+    .eq-bars span:nth-child(3) { height: 22px; animation-delay: 0.4s; }
+    .eq-bars span:nth-child(4) { height: 36px; animation-delay: 0.1s; }
+    .eq-bars span:nth-child(5) { height: 18px; animation-delay: 0.35s; }
+    @keyframes eq {
+      from { height: 10px; opacity: 0.55; }
+      to { height: 34px; opacity: 1; }
+    }
+    .lyric-preview {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.86rem;
+    }
+    .lyric-dim { color: var(--muted); opacity: 0.65; }
+    .lyric-active { color: var(--text); font-weight: 800; font-size: 0.96rem; margin: 4px 0; }
+    .lyric-tr { color: var(--primary); font-size: 0.8rem; }
+
+    /* Stats strip */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      padding-top: 10px;
+      padding-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    /* Section Header */
+    .sec-head { margin-bottom: 28px; }
+    .sec-head h2 {
+      font-size: clamp(1.55rem, 2.8vw, 2.15rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .sec-head p { color: var(--muted); max-width: 640px; }
+
+    /* Features Grid */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .card:hover { background: var(--card-hover); border-color: rgba(124, 196, 250, 0.35); }
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 14px;
+    }
+    .card h3 { font-size: 1.06rem; font-weight: 800; margin-bottom: 8px; }
+    .card p { font-size: 0.9rem; color: var(--muted); }
+
+    /* Live Explorer (Radio + Charts) */
+    .explorer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .list-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .list-box-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .list-box-head h3 { font-size: 1.08rem; font-weight: 800; }
+    .scroll-list {
+      max-height: 310px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--bg-elev);
+      border: 1px solid rgba(34, 42, 58, 0.7);
+      font-size: 0.88rem;
+    }
+    .list-item:hover { border-color: var(--primary); }
+    .list-item small { display: block; color: var(--muted); font-size: 0.78rem; }
+    .live-pill {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* FAQ */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 820px;
+    }
+    details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    summary {
+      font-weight: 800;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::after { content: "+"; color: var(--primary); font-size: 1.2rem; }
+    details[open] summary::after { content: "−"; }
+    details p { margin-top: 10px; color: var(--muted); font-size: 0.92rem; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-elev);
+      padding: 36px 20px;
+      margin-top: 24px;
+    }
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 18px; }
+    .footer-links a:hover { color: var(--primary); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 32px; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .explorer-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="brand">
-      <h1>HiFi</h1>
-      <span class="badge">HI-RES</span>
-    </div>
-    <p class="sub">Pemutar musik bebas iklan dengan lirik sinkronisasi, terjemahan pintar, Live Radio, dan kualitas audio jernih.</p>
+  <header class="nav-wrap">
+    <nav class="nav">
+      <a class="brand" href="#">
+        HiFi <span class="badge">HI-RES</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features" data-i18n="nav_features">Fitur</a>
+        <a href="#explorer" data-i18n="nav_live">Radio &amp; Chart</a>
+        <a href="#download" data-i18n="nav_download">Unduh</a>
+        <a href="#faq" data-i18n="nav_faq">FAQ</a>
+      </div>
+      <div class="nav-actions">
+        <button id="lang-toggle" class="lang-btn" type="button">EN / ID</button>
+        <a class="nav-cta" href="https://github.com/saferill/HiFi" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </nav>
+  </header>
 
-    <div id="deeplink-box">
-      <p style="margin-bottom:12px;font-weight:700;">Membuka konten di aplikasi HiFi...</p>
-      <a id="open-app-btn" class="btn" href="#">Buka di Aplikasi HiFi</a>
-    </div>
+  <main>
+    <!-- Hero & Smart Downloader -->
+    <section class="section hero" id="download">
+      <div>
+        <div class="status-pill">
+          <span class="dot"></span>
+          <span data-i18n="hero_pill">Open-Source (GPL-3.0) • Bebas Iklan • F-Droid Pending</span>
+        </div>
+        <h1 data-i18n="hero_title">Streaming Musik <span>Hi-Res</span> Tanpa Iklan &amp; Batas.</h1>
+        <p class="lead" data-i18n="hero_desc">
+          Pemutar musik modern untuk Android &amp; Desktop dengan lirik sinkronisasi real-time, terjemahan AI, Radio Live 24/7, dan Tangga Lagu 100+ negara.
+        </p>
 
-    <a id="download-btn" class="btn" href="https://github.com/saferill/HiFi/releases/latest">
-      Unduh APK Terbaru (Otomatis Sesuai HP)
-    </a>
-    <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases">
-      Lihat Semua Versi di GitHub Releases
-    </a>
-    <div id="version-info" class="meta">Mendeteksi versi terbaru & arsitektur perangkat...</div>
-  </div>
+        <div id="deeplink-box">
+          <p style="margin-bottom:10px;font-weight:700;" data-i18n="deeplink_text">Membuka tautan di aplikasi HiFi...</p>
+          <a id="open-app-btn" class="btn btn-primary" href="#" data-i18n="deeplink_btn">Buka di Aplikasi HiFi</a>
+        </div>
+
+        <div class="cta-group">
+          <a id="download-btn" class="btn btn-primary" href="https://github.com/saferill/HiFi/releases/latest">
+            Unduh APK Terbaru (Otomatis Sesuai HP)
+          </a>
+          <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener" data-i18n="all_releases">
+            Semua Rilis
+          </a>
+        </div>
+        <div id="version-info" class="version-info">Mendeteksi versi terbaru &amp; arsitektur perangkat...</div>
+
+        <div class="abi-pills" id="abi-pills">
+          <a class="abi-pill" data-abi="arm64-v8a" href="https://github.com/saferill/HiFi/releases/latest">arm64-v8a (Modern)</a>
+          <a class="abi-pill" data-abi="armeabi-v7a" href="https://github.com/saferill/HiFi/releases/latest">armeabi-v7a (32-bit)</a>
+          <a class="abi-pill" data-abi="x86_64" href="https://github.com/saferill/HiFi/releases/latest">x86_64</a>
+          <a class="abi-pill" data-abi="universal" href="https://github.com/saferill/HiFi/releases/latest">Universal APK</a>
+        </div>
+      </div>
+
+      <div class="mockup" aria-hidden="true">
+        <div class="mockup-top">
+          <span>NOW PLAYING • STREAMING</span>
+          <span class="hires-tag">HI-RES AUDIO</span>
+        </div>
+        <div class="cover-art">
+          <div class="eq-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <strong style="font-size:1.1rem;">HiFi Music Engine</strong>
+          <small style="color:var(--muted);margin-top:4px;">Zero Ads • Background Play • Offline Cache</small>
+        </div>
+        <div class="lyric-preview">
+          <div class="lyric-dim">♪ Sinkronisasi kata demi kata real-time</div>
+          <div class="lyric-active">Dengarkan musik favoritmu tanpa jeda iklan</div>
+          <div class="lyric-tr">Terjemahan otomatis multi-bahasa • LRCLIB &amp; HiFi Lyrics</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Stats -->
+    <section class="section stats" style="padding-top:0;">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-radios">14</div>
+        <div class="stat-label" data-i18n="stat_radio">Stasiun Radio Live 24/7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-charts">103</div>
+        <div class="stat-label" data-i18n="stat_charts">Tangga Lagu Negara</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">0</div>
+        <div class="stat-label" data-i18n="stat_ads">Iklan &amp; Pop-up Mengganggu</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-stars">GPL-3.0</div>
+        <div class="stat-label" data-i18n="stat_oss">Lisensi Open-Source</div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="sec-head">
+        <h2 data-i18n="feat_heading">Semua yang Kamu Butuhkan dalam Satu Pemutar Musik</h2>
+        <p data-i18n="feat_sub">Dibangun dengan Kotlin Multiplatform dan dirancang ringan agar stabil dipakai setiap hari.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <div class="card-icon">🎵</div>
+          <h3 data-i18n="f1_t">Audio Jernih &amp; Pemutar Tangguh</h3>
+          <p data-i18n="f1_d">Dukungan multi-client YouTube Music dengan pemutaran latar belakang, equalizer, skip silence, dan pembaruan konfigurasi otomatis.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">💬</div>
+          <h3 data-i18n="f2_t">Lirik Sinkron &amp; Terjemahan Pintar</h3>
+          <p data-i18n="f2_d">Tampilan lirik ala Apple Music dari LRCLIB &amp; HiFi-lyrics, lengkap dengan dukungan terjemahan otomatis multi-bahasa.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">📻</div>
+          <h3 data-i18n="f3_t">Radio Live 24/7 Auto-Heal</h3>
+          <p data-i18n="f3_d">Nikmati 14 stasiun Lofi, Jazz, Pop Hits, hingga berita global yang dicek otomatis setiap 2 jam agar selalu aktif.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">🌍</div>
+          <h3 data-i18n="f4_t">Tangga Lagu 100+ Negara</h3>
+          <p data-i18n="f4_d">Jelajahi Top 50 Indonesia, Global, Korea, Jepang, hingga 100+ negara lain yang diperbarui otomatis langsung dari YouTube Music.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">🎧</div>
+          <h3 data-i18n="f5_t">Offline Cache &amp; Listen Together</h3>
+          <p data-i18n="f5_d">Simpan lagu untuk diputar offline, dengarkan bersama teman secara real-time, lewati segmen sponsor dengan SponsorBlock, dan Sleep Timer.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">🛡️</div>
+          <h3 data-i18n="f6_t">Privasi Terjaga &amp; Transparan</h3>
+          <p data-i18n="f6_d">100% open-source di bawah lisensi GPL-3.0 tanpa SDK iklan tersembunyi, sedang dalam proses pengajuan resmi di F-Droid.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Live Radio & Charts Explorer -->
+    <section class="section" id="explorer">
+      <div class="sec-head">
+        <h2 data-i18n="exp_heading">Radio Live &amp; Tangga Lagu Aktif Sekarang</h2>
+        <p data-i18n="exp_sub">Data di bawah dimuat langsung dari ekosistem GitHub HiFi yang diperbarui otomatis setiap 2 jam.</p>
+      </div>
+      <div class="explorer-grid">
+        <div class="list-box">
+          <div class="list-box-head">
+            <h3 data-i18n="exp_radio_t">📻 Radio Live 24/7</h3>
+            <span class="live-pill" id="radio-count-pill">14 LIVE</span>
+          </div>
+          <div class="scroll-list" id="radio-list">
+            <div class="list-item"><span>Memuat daftar radio...</span></div>
+          </div>
+        </div>
+        <div class="list-box">
+          <div class="list-box-head">
+            <h3 data-i18n="exp_chart_t">📈 Tangga Lagu HiFi</h3>
+            <span class="live-pill" id="chart-count-pill">103 CHARTS</span>
+          </div>
+          <div class="scroll-list" id="chart-list">
+            <div class="list-item"><span>Memuat daftar tangga lagu...</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="sec-head">
+        <h2 data-i18n="faq_heading">Pertanyaan yang Sering Diajukan</h2>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary data-i18n="q1">Apakah HiFi gratis dan bebas iklan?</summary>
+          <p data-i18n="a1">Ya, HiFi 100% gratis, open-source (GPL-3.0), dan tidak memiliki iklan banner, pop-up iklan, maupun pelacak komersial.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">File APK mana yang harus saya unduh?</summary>
+          <p data-i18n="a2">Tombol unduh di atas sudah otomatis memilihkan arsitektur yang cocok (biasanya arm64-v8a untuk HP Android modern). Jika ragu atau gagal pasang, pilih Universal APK.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">Apakah HiFi tersedia di F-Droid?</summary>
+          <p data-i18n="a3">HiFi saat ini sedang dalam tahap pengajuan resmi untuk masuk ke katalog F-Droid agar pembaruan aplikasi ke depannya makin mudah dan terverifikasi.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">Bagaimana jika radio live atau tangga lagu bermasalah?</summary>
+          <p data-i18n="a4">Bot otomatis di GitHub Actions mengecek dan menyembuhkan link radio serta tangga lagu setiap 2 jam sekali. Cukup tutup dan buka ulang aplikasi untuk menyegarkan cache.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 HiFi Music • Open-Source under GPL-3.0</div>
+      <div class="footer-links">
+        <a href="https://github.com/saferill/HiFi" target="_blank" rel="noopener">HiFi App</a>
+        <a href="https://github.com/saferill/HiFi-files" target="_blank" rel="noopener">HiFi-files</a>
+        <a href="https://github.com/saferill/HiFi-charts" target="_blank" rel="noopener">HiFi-charts</a>
+        <a href="https://github.com/saferill/HiFi-lyrics" target="_blank" rel="noopener">HiFi-lyrics</a>
+        <a href="https://github.com/saferill/HiFi-canvas" target="_blank" rel="noopener">HiFi-canvas</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    (async function() {
+    const I18N = {
+      id: {
+        nav_features: "Fitur",
+        nav_live: "Radio & Chart",
+        nav_download: "Unduh",
+        nav_faq: "FAQ",
+        hero_pill: "Open-Source (GPL-3.0) • Bebas Iklan • F-Droid Pending",
+        hero_title: 'Streaming Musik <span>Hi-Res</span> Tanpa Iklan &amp; Batas.',
+        hero_desc: "Pemutar musik modern untuk Android & Desktop dengan lirik sinkronisasi real-time, terjemahan AI, Radio Live 24/7, dan Tangga Lagu 100+ negara.",
+        deeplink_text: "Membuka tautan di aplikasi HiFi...",
+        deeplink_btn: "Buka di Aplikasi HiFi",
+        all_releases: "Semua Rilis",
+        stat_radio: "Stasiun Radio Live 24/7",
+        stat_charts: "Tangga Lagu Negara",
+        stat_ads: "Iklan & Pop-up Mengganggu",
+        stat_oss: "Lisensi Open-Source",
+        feat_heading: "Semua yang Kamu Butuhkan dalam Satu Pemutar Musik",
+        feat_sub: "Dibangun dengan Kotlin Multiplatform dan dirancang ringan agar stabil dipakai setiap hari.",
+        f1_t: "Audio Jernih & Pemutar Tangguh",
+        f1_d: "Dukungan multi-client YouTube Music dengan pemutaran latar belakang, equalizer, skip silence, dan pembaruan konfigurasi otomatis.",
+        f2_t: "Lirik Sinkron & Terjemahan Pintar",
+        f2_d: "Tampilan lirik ala Apple Music dari LRCLIB & HiFi-lyrics, lengkap dengan dukungan terjemahan otomatis multi-bahasa.",
+        f3_t: "Radio Live 24/7 Auto-Heal",
+        f3_d: "Nikmati 14 stasiun Lofi, Jazz, Pop Hits, hingga berita global yang dicek otomatis setiap 2 jam agar selalu aktif.",
+        f4_t: "Tangga Lagu 100+ Negara",
+        f4_d: "Jelajahi Top 50 Indonesia, Global, Korea, Jepang, hingga 100+ negara lain yang diperbarui otomatis langsung dari YouTube Music.",
+        f5_t: "Offline Cache & Listen Together",
+        f5_d: "Simpan lagu untuk diputar offline, dengarkan bersama teman secara real-time, lewati segmen sponsor dengan SponsorBlock, dan Sleep Timer.",
+        f6_t: "Privasi Terjaga & Transparan",
+        f6_d: "100% open-source di bawah lisensi GPL-3.0 tanpa SDK iklan tersembunyi, sedang dalam proses pengajuan resmi di F-Droid.",
+        exp_heading: "Radio Live & Tangga Lagu Aktif Sekarang",
+        exp_sub: "Data di bawah dimuat langsung dari ekosistem GitHub HiFi yang diperbarui otomatis setiap 2 jam.",
+        exp_radio_t: "📻 Radio Live 24/7",
+        exp_chart_t: "📈 Tangga Lagu HiFi",
+        faq_heading: "Pertanyaan yang Sering Diajukan",
+        q1: "Apakah HiFi gratis dan bebas iklan?",
+        a1: "Ya, HiFi 100% gratis, open-source (GPL-3.0), dan tidak memiliki iklan banner, pop-up iklan, maupun pelacak komersial.",
+        q2: "File APK mana yang harus saya unduh?",
+        a2: "Tombol unduh di atas sudah otomatis memilihkan arsitektur yang cocok (biasanya arm64-v8a untuk HP Android modern). Jika ragu atau gagal pasang, pilih Universal APK.",
+        q3: "Apakah HiFi tersedia di F-Droid?",
+        a3: "HiFi saat ini sedang dalam tahap pengajuan resmi untuk masuk ke katalog F-Droid agar pembaruan aplikasi ke depannya makin mudah dan terverifikasi.",
+        q4: "Bagaimana jika radio live atau tangga lagu bermasalah?",
+        a4: "Bot otomatis di GitHub Actions mengecek dan menyembuhkan link radio serta tangga lagu setiap 2 jam sekali. Cukup tutup dan buka ulang aplikasi untuk menyegarkan cache."
+      },
+      en: {
+        nav_features: "Features",
+        nav_live: "Radio & Charts",
+        nav_download: "Download",
+        nav_faq: "FAQ",
+        hero_pill: "Open-Source (GPL-3.0) • Ad-Free • F-Droid Pending",
+        hero_title: 'Ad-Free <span>Hi-Res</span> Music Streaming Without Limits.',
+        hero_desc: "Modern open-source music player for Android & Desktop with real-time synced lyrics, smart translation, 24/7 Live Radio, and 100+ country charts.",
+        deeplink_text: "Opening content in HiFi app...",
+        deeplink_btn: "Open in HiFi App",
+        all_releases: "All Releases",
+        stat_radio: "24/7 Live Radio Stations",
+        stat_charts: "Country Music Charts",
+        stat_ads: "Ads & Annoying Pop-ups",
+        stat_oss: "Open-Source License",
+        feat_heading: "Everything You Need in One Music Player",
+        feat_sub: "Built with Kotlin Multiplatform and engineered to be fast, clean, and reliable every day.",
+        f1_t: "Crisp Audio & Resilient Engine",
+        f1_d: "Multi-client YouTube Music playback with background play, equalizer, skip silence, and automatic remote player config updates.",
+        f2_t: "Synced Lyrics & Smart Translation",
+        f2_d: "Apple Music-style synced lyrics powered by LRCLIB & HiFi-lyrics with multi-language translation support.",
+        f3_t: "24/7 Auto-Heal Live Radio",
+        f3_d: "Enjoy 14 Lofi, Jazz, Pop Hits, and global news live stations verified automatically every 2 hours.",
+        f4_t: "100+ Country Music Charts",
+        f4_d: "Explore Top 50 Indonesia, Global, Korea, Japan, and 100+ countries synced directly from YouTube Music.",
+        f5_t: "Offline Cache & Listen Together",
+        f5_d: "Cache tracks for offline listening, listen together with friends in real time, skip sponsors with SponsorBlock, and set Sleep Timers.",
+        f6_t: "Privacy-First & Transparent",
+        f6_d: "100% open-source under GPL-3.0 with zero hidden ad SDKs, currently undergoing official F-Droid submission.",
+        exp_heading: "Live Radio & Active Charts Right Now",
+        exp_sub: "Loaded live from HiFi's GitHub ecosystem, automatically synchronized every 2 hours.",
+        exp_radio_t: "📻 24/7 Live Radio",
+        exp_chart_t: "📈 HiFi Music Charts",
+        faq_heading: "Frequently Asked Questions",
+        q1: "Is HiFi completely free and ad-free?",
+        a1: "Yes. HiFi is 100% free, open-source (GPL-3.0), with zero banner ads, ad pop-ups, or commercial trackers.",
+        q2: "Which APK file should I download?",
+        a2: "The download button above automatically selects the best match for your device (usually arm64-v8a for modern Android phones). If unsure, choose Universal APK.",
+        q3: "Is HiFi available on F-Droid?",
+        a3: "HiFi is currently in the official F-Droid submission process so future installs and updates are even easier and reproducibly verified.",
+        q4: "What if a live radio or chart stops working?",
+        a4: "Automated GitHub Actions bots check and heal radio and chart links every 2 hours. Simply restart the app to refresh its local config cache."
+      }
+    };
+
+    let currentLang = (navigator.language || "id").toLowerCase().startsWith("id") ? "id" : "en";
+
+    function applyLang(lang) {
+      currentLang = lang;
+      const dict = I18N[lang];
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.innerHTML = dict[key];
+      });
+    }
+
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      applyLang(currentLang === "id" ? "en" : "id");
+    });
+    applyLang(currentLang);
+
+    // Smart 1-Click APK Downloader + Architecture Pills
+    (async function () {
       const ua = navigator.userAgent.toLowerCase();
       let abi = "arm64-v8a";
       if (ua.includes("x86_64") || ua.includes("amd64")) abi = "x86_64";
@@ -59,24 +783,80 @@
 
       const btn = document.getElementById("download-btn");
       const info = document.getElementById("version-info");
+      const pills = document.querySelectorAll(".abi-pill");
+
+      pills.forEach(p => {
+        if (p.dataset.abi === abi) p.classList.add("active");
+      });
+
       try {
         const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases/latest");
         if (res.ok) {
           const data = await res.json();
           const tag = data.tag_name || "";
-          const asset = (data.assets || []).find(a => a.name.includes(abi) && a.name.endsWith(".apk"))
-                     || (data.assets || []).find(a => a.name.includes("universal") && a.name.endsWith(".apk"))
-                     || (data.assets || []).find(a => a.name.endsWith(".apk"));
-          if (asset) {
-            btn.href = asset.browser_download_url;
-            btn.textContent = `Unduh HiFi ${tag} (${abi})`;
-            info.textContent = `Versi terbaru: ${tag} • Otomatis dipilih untuk ${abi}`;
+          const assets = data.assets || [];
+          const findApk = (arch) =>
+            assets.find(a => a.name.includes(arch) && a.name.endsWith(".apk")) ||
+            assets.find(a => a.name.includes("universal") && a.name.endsWith(".apk")) ||
+            assets.find(a => a.name.endsWith(".apk"));
+
+          const best = findApk(abi);
+          if (best) {
+            const sizeMb = (best.size / (1024 * 1024)).toFixed(1);
+            btn.href = best.browser_download_url;
+            btn.textContent = currentLang === "id"
+              ? `Unduh HiFi ${tag} (${abi} • ${sizeMb} MB)`
+              : `Download HiFi ${tag} (${abi} • ${sizeMb} MB)`;
+            info.textContent = currentLang === "id"
+              ? `Versi terbaru: ${tag} • Dipilih otomatis untuk ${abi}`
+              : `Latest release: ${tag} • Auto-selected for ${abi}`;
           }
+          pills.forEach(p => {
+            const match = findApk(p.dataset.abi);
+            if (match) p.href = match.browser_download_url;
+          });
         }
       } catch (e) {
         btn.href = `https://github.com/saferill/HiFi/releases/latest/download/HiFi-foss-androidApp-${abi}-release.apk`;
         info.textContent = `Arsitektur terdeteksi: ${abi}`;
       }
+    })();
+
+    // Live Radio & Charts Explorer
+    (async function () {
+      try {
+        const rRes = await fetch("https://raw.githubusercontent.com/saferill/HiFi-files/main/remote-config.json");
+        if (rRes.ok) {
+          const rJson = await rRes.json();
+          const stations = rJson.radioStations || [];
+          document.getElementById("stat-radios").textContent = stations.length;
+          document.getElementById("radio-count-pill").textContent = `${stations.length} LIVE`;
+          const rList = document.getElementById("radio-list");
+          rList.innerHTML = stations.map(st => `
+            <a class="list-item" href="https://www.youtube.com/watch?v=${st.videoId}" target="_blank" rel="noopener">
+              <div><strong>${st.title}</strong><small>${st.subtitle || "LIVE"}</small></div>
+              <span class="live-pill">LIVE</span>
+            </a>
+          `).join("");
+        }
+      } catch (e) {}
+
+      try {
+        const cRes = await fetch("https://raw.githubusercontent.com/saferill/HiFi-charts/main/api/playlists.json");
+        if (cRes.ok) {
+          const cJson = await cRes.json();
+          const charts = cJson.data || [];
+          document.getElementById("stat-charts").textContent = charts.length;
+          document.getElementById("chart-count-pill").textContent = `${charts.length} CHARTS`;
+          const cList = document.getElementById("chart-list");
+          cList.innerHTML = charts.slice(0, 30).map(ch => `
+            <a class="list-item" href="${ch.youtubeUrl}" target="_blank" rel="noopener">
+              <div><strong>${ch.name}</strong><small>${ch.description || ch.country.toUpperCase()}</small></div>
+              <span class="live-pill">${(ch.country || "").toUpperCase()}</span>
+            </a>
+          `).join("");
+        }
+      } catch (e) {}
     })();
   </script>
 </body>
