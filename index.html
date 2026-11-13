@@ -539,6 +539,51 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
+    .list-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .action-pill {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 5px 9px;
+      border-radius: 7px;
+      white-space: nowrap;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .action-pill:hover { opacity: 0.88; transform: translateY(-1px); }
+    .action-hifi {
+      color: #061320;
+      background: var(--primary);
+    }
+    .action-yt {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+    }
+    .action-yt:hover { color: var(--text); border-color: var(--primary); }
+
+    /* QR Modal */
+    .qr-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.75);
+    }
+    .qr-box {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px;
+      display: inline-block;
+      margin: 14px 0;
+    }
+    .qr-box img { display: block; width: 200px; height: 200px; }
 
     /* FAQ */
     .faq-list {
@@ -827,6 +872,7 @@
             <a class="abi-pill" data-abi="armeabi-v7a" href="https://github.com/saferill/HiFi/releases/latest">armeabi-v7a (32-bit)</a>
             <a class="abi-pill" data-abi="x86_64" href="https://github.com/saferill/HiFi/releases/latest">x86_64</a>
             <a class="abi-pill" data-abi="universal" href="https://github.com/saferill/HiFi/releases/latest">Universal APK</a>
+            <button class="abi-pill" id="qr-btn" type="button" style="cursor:pointer;" data-i18n="qr_btn">📱 Scan QR di HP</button>
           </div>
         </div>
 
@@ -1050,6 +1096,20 @@
     </div>
   </div>
 
+  <!-- QR Download Modal -->
+  <div class="lightbox" id="qr-modal" role="dialog" aria-modal="true">
+    <div class="qr-card">
+      <h3 style="font-size:1.15rem;font-weight:900;" data-i18n="qr_title">Scan untuk Unduh di HP</h3>
+      <p style="font-size:0.84rem;color:var(--muted);margin-top:6px;" data-i18n="qr_sub">Arahkan kamera HP Android ke QR Code ini untuk langsung mengunduh APK HiFi terbaru.</p>
+      <div class="qr-box">
+        <img id="qr-img" src="" alt="QR Code Download HiFi APK" />
+      </div>
+      <div>
+        <button class="lb-btn" id="qr-close" type="button" data-i18n="qr_close">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-inner">
       <div>© 2026 HiFi Music • Open-Source under GPL-3.0</div>
@@ -1124,6 +1184,10 @@
         comm_bug: "🐞 Lapor Bug / Fitur",
         comm_disc: "💬 Diskusi",
         comm_star: "⭐ Star di GitHub",
+        qr_btn: "📱 Scan QR di HP",
+        qr_title: "Scan untuk Unduh di HP",
+        qr_sub: "Arahkan kamera HP Android ke QR Code ini untuk langsung mengunduh APK HiFi terbaru.",
+        qr_close: "Tutup",
         faq_heading: "Pertanyaan yang Sering Diajukan",
         q1: "Apakah HiFi gratis dan bebas iklan?",
         a1: "Ya, HiFi 100% gratis, open-source (GPL-3.0), dan tidak memiliki iklan banner, pop-up iklan, maupun pelacak komersial.",
@@ -1193,6 +1257,10 @@
         comm_bug: "🐞 Report Bug / Feature",
         comm_disc: "💬 Discussions",
         comm_star: "⭐ Star on GitHub",
+        qr_btn: "📱 Scan QR on Phone",
+        qr_title: "Scan to Download on Phone",
+        qr_sub: "Point your Android phone camera at this QR code to download the latest HiFi APK.",
+        qr_close: "Close",
         faq_heading: "Frequently Asked Questions",
         q1: "Is HiFi completely free and ad-free?",
         a1: "Yes. HiFi is 100% free, open-source (GPL-3.0), with zero banner ads, ad pop-ups, or commercial trackers.",
@@ -1260,6 +1328,17 @@
       if (e.key === "ArrowLeft") openShot(activeShot - 1);
       if (e.key === "ArrowRight") openShot(activeShot + 1);
     });
+
+    // QR Modal
+    const qrModal = document.getElementById("qr-modal");
+    const qrImg = document.getElementById("qr-img");
+    document.getElementById("qr-btn").addEventListener("click", () => {
+      const targetUrl = document.getElementById("download-btn").href || "https://saferill.github.io/HiFi-web/";
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodeURIComponent(targetUrl)}`;
+      qrModal.classList.add("open");
+    });
+    document.getElementById("qr-close").addEventListener("click", () => qrModal.classList.remove("open"));
+    qrModal.addEventListener("click", (e) => { if (e.target === qrModal) qrModal.classList.remove("open"); });
 
     // Platform Tabs (Android / Desktop)
     document.querySelectorAll(".platform-tab").forEach(tab => {
@@ -1401,13 +1480,16 @@
         const rList = document.getElementById("radio-list");
         rList.innerHTML = filtered.length
           ? filtered.map(st => `
-              <a class="list-item" href="https://www.youtube.com/watch?v=${st.videoId}" target="_blank" rel="noopener">
+              <div class="list-item">
                 <div class="list-item-text">
-                  <strong>${st.title}</strong>
-                  <small>${st.subtitle || "LIVE"}</small>
+                  <strong>${escapeHtml(st.title)}</strong>
+                  <small>${escapeHtml(st.subtitle || "LIVE")}</small>
                 </div>
-                <span class="live-pill">LIVE</span>
-              </a>
+                <div class="list-actions">
+                  <a class="action-pill action-hifi" href="hifi://watch?v=${encodeURIComponent(st.videoId)}" title="Buka di aplikasi HiFi">▶ HiFi</a>
+                  <a class="action-pill action-yt" href="https://www.youtube.com/watch?v=${encodeURIComponent(st.videoId)}" target="_blank" rel="noopener">YouTube</a>
+                </div>
+              </div>
             `).join("")
           : `<div class="list-item"><div class="list-item-text"><small>Tidak ada radio yang cocok.</small></div></div>`;
       }
@@ -1419,15 +1501,27 @@
           : allCharts;
         const cList = document.getElementById("chart-list");
         cList.innerHTML = filtered.length
-          ? filtered.map(ch => `
-              <a class="list-item" href="${ch.youtubeUrl}" target="_blank" rel="noopener">
-                <div class="list-item-text">
-                  <strong>${ch.name}</strong>
-                  <small>${ch.description || (ch.country || "").toUpperCase()}</small>
+          ? filtered.map(ch => {
+              let listId = ch.playlistId || "";
+              if (!listId && ch.youtubeUrl) {
+                try { listId = new URL(ch.youtubeUrl).searchParams.get("list") || ""; } catch (e) {}
+              }
+              const hifiBtn = listId
+                ? `<a class="action-pill action-hifi" href="hifi://playlist?list=${encodeURIComponent(listId)}" title="Buka di aplikasi HiFi">▶ HiFi</a>`
+                : "";
+              return `
+                <div class="list-item">
+                  <div class="list-item-text">
+                    <strong>${escapeHtml(ch.name)}</strong>
+                    <small>${escapeHtml(ch.description || (ch.country || "").toUpperCase())}</small>
+                  </div>
+                  <div class="list-actions">
+                    ${hifiBtn}
+                    <a class="action-pill action-yt" href="${ch.youtubeUrl}" target="_blank" rel="noopener">${escapeHtml((ch.country || "YT").toUpperCase())} ↗</a>
+                  </div>
                 </div>
-                <span class="live-pill">${(ch.country || "").toUpperCase()}</span>
-              </a>
-            `).join("")
+              `;
+            }).join("")
           : `<div class="list-item"><div class="list-item-text"><small>Tidak ada chart yang cocok.</small></div></div>`;
       }
 
