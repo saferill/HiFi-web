@@ -288,6 +288,9 @@
       border: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow: 0 30px 70px rgba(0, 0, 0, 0.65);
       cursor: zoom-in;
+      font: inherit;
+      color: inherit;
+      text-align: inherit;
       transition: transform 0.22s ease;
     }
     .phone-frame:hover { transform: translateY(-4px); }
@@ -352,6 +355,10 @@
       border-radius: 20px;
       overflow: hidden;
       cursor: zoom-in;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      text-align: inherit;
       transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
     .shot-card:hover {
@@ -809,6 +816,61 @@
       .stats { grid-template-columns: repeat(2, 1fr); }
       .nav-links { display: none; }
     }
+
+    /* Accessibility & Error States */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body.no-scroll { overflow: hidden; }
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .filter-input:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 0;
+    }
+    .filter-input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .list-item--error {
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(248, 113, 113, 0.08);
+    }
+    .list-retry-btn {
+      background: var(--primary);
+      color: #061320;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .list-retry-btn:hover { opacity: 0.9; }
+    .stat-note {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+    .qr-box canvas { display: block; width: 200px; height: 200px; }
+    .qr-status {
+      font-size: 0.82rem;
+      color: #334155;
+      padding: 84px 12px;
+      min-width: 200px;
+    }
   </style>
 </head>
 <body>
@@ -847,16 +909,16 @@
         </p>
 
         <div id="deeplink-box">
-          <p style="margin-bottom:10px;font-weight:700;" data-i18n="deeplink_text">Membuka tautan di aplikasi HiFi...</p>
+          <p id="deeplink-text" style="margin-bottom:10px;font-weight:700;" data-i18n="deeplink_text">Membuka tautan di aplikasi HiFi...</p>
           <a id="open-app-btn" class="btn btn-primary" href="#" data-i18n="deeplink_btn">Buka di Aplikasi HiFi</a>
         </div>
 
-        <div class="platform-tabs" role="tablist">
-          <button class="platform-tab active" type="button" data-platform="android" data-i18n="tab_android">📱 Android (APK)</button>
-          <button class="platform-tab" type="button" data-platform="desktop" data-i18n="tab_desktop">💻 Desktop</button>
+        <div class="platform-tabs" role="tablist" aria-label="Platform">
+          <button class="platform-tab active" id="tab-android" type="button" role="tab" aria-controls="panel-android" aria-selected="true" tabindex="0" data-platform="android" data-i18n="tab_android">📱 Android (APK)</button>
+          <button class="platform-tab" id="tab-desktop" type="button" role="tab" aria-controls="panel-desktop" aria-selected="false" tabindex="-1" data-platform="desktop" data-i18n="tab_desktop">💻 Desktop</button>
         </div>
 
-        <div class="platform-panel active" id="panel-android">
+        <div class="platform-panel active" id="panel-android" role="tabpanel" aria-labelledby="tab-android" tabindex="0">
           <div class="cta-group">
             <a id="download-btn" class="btn btn-primary" href="https://github.com/saferill/HiFi/releases/latest">
               Unduh APK Terbaru (Otomatis Sesuai HP)
@@ -865,7 +927,7 @@
               Semua Rilis
             </a>
           </div>
-          <div id="version-info" class="version-info">Mendeteksi versi terbaru &amp; arsitektur perangkat...</div>
+          <div id="version-info" class="version-info"></div>
 
           <div class="abi-pills" id="abi-pills">
             <a class="abi-pill" data-abi="arm64-v8a" href="https://github.com/saferill/HiFi/releases/latest">arm64-v8a (Modern)</a>
@@ -876,10 +938,8 @@
           </div>
         </div>
 
-        <div class="platform-panel" id="panel-desktop">
-          <div class="desktop-note" id="desktop-status" data-i18n="desktop_checking">
-            Memeriksa installer Desktop (Windows / macOS / Linux) di rilis terbaru...
-          </div>
+        <div class="platform-panel" id="panel-desktop" role="tabpanel" aria-labelledby="tab-desktop" tabindex="0" hidden>
+          <div class="desktop-note" id="desktop-status"></div>
           <div class="cta-group" id="desktop-actions">
             <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener" data-i18n="all_releases">
               Semua Rilis
@@ -893,9 +953,9 @@
 
       <div class="hero-showcase">
         <div class="hero-glow"></div>
-        <div class="phone-frame" data-shot-index="0" title="Klik untuk perbesar">
-          <img src="assets/screenshots/1.png" alt="Tampilan Beranda Aplikasi HiFi Music" />
-        </div>
+        <button class="phone-frame" type="button" data-shot-index="0" aria-label="Perbesar tangkapan layar 1: Beranda HiFi">
+          <img src="assets/screenshots/1.png" alt="Tampilan Beranda Aplikasi HiFi Music" aria-hidden="true" width="300" height="640" />
+        </button>
       </div>
     </section>
 
@@ -904,6 +964,7 @@
       <div class="stat-card">
         <div class="stat-num" id="stat-radios">14</div>
         <div class="stat-label" data-i18n="stat_radio">Stasiun Radio Live 24/7</div>
+        <div class="stat-note" id="stat-radio-note" hidden></div>
       </div>
       <div class="stat-card">
         <div class="stat-num" id="stat-charts">103</div>
@@ -926,13 +987,13 @@
         <p data-i18n="prev_sub">Desain bersih, responsif, dan nyaman dipakai di layar Android maupun Desktop. Klik gambar untuk melihat lebih jelas.</p>
       </div>
       <div class="gallery-track" id="gallery-track">
-        <div class="shot-card" data-shot-index="0"><img src="assets/screenshots/1.png" alt="HiFi Home Screen" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="1"><img src="assets/screenshots/2.png" alt="HiFi Search & Moods" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="2"><img src="assets/screenshots/3.png" alt="HiFi Now Playing" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="3"><img src="assets/screenshots/4.png" alt="HiFi Synced Lyrics" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="4"><img src="assets/screenshots/5.png" alt="HiFi Features View" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="5"><img src="assets/screenshots/6.png" alt="HiFi Library & Cache" loading="lazy" /></div>
-        <div class="shot-card" data-shot-index="6"><img src="assets/screenshots/7.png" alt="HiFi Charts & Radio" loading="lazy" /></div>
+        <button class="shot-card" type="button" data-shot-index="0" data-shot-name="Home Screen" aria-label="Perbesar tangkapan layar 1: Home Screen"><img src="assets/screenshots/1.png" alt="HiFi Home Screen" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="1" data-shot-name="Search &amp; Moods" aria-label="Perbesar tangkapan layar 2: Search &amp; Moods"><img src="assets/screenshots/2.png" alt="HiFi Search & Moods" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="2" data-shot-name="Now Playing" aria-label="Perbesar tangkapan layar 3: Now Playing"><img src="assets/screenshots/3.png" alt="HiFi Now Playing" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="3" data-shot-name="Synced Lyrics" aria-label="Perbesar tangkapan layar 4: Synced Lyrics"><img src="assets/screenshots/4.png" alt="HiFi Synced Lyrics" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="4" data-shot-name="Features View" aria-label="Perbesar tangkapan layar 5: Features View"><img src="assets/screenshots/5.png" alt="HiFi Features View" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="5" data-shot-name="Library &amp; Cache" aria-label="Perbesar tangkapan layar 6: Library &amp; Cache"><img src="assets/screenshots/6.png" alt="HiFi Library & Cache" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
+        <button class="shot-card" type="button" data-shot-index="6" data-shot-name="Charts &amp; Radio" aria-label="Perbesar tangkapan layar 7: Charts &amp; Radio"><img src="assets/screenshots/7.png" alt="HiFi Charts & Radio" aria-hidden="true" loading="lazy" width="240" height="427" /></button>
       </div>
     </section>
 
@@ -988,20 +1049,20 @@
             <h3 data-i18n="exp_radio_t">📻 Radio Live 24/7</h3>
             <span class="live-pill" id="radio-count-pill">14 LIVE</span>
           </div>
-          <input id="radio-search" class="filter-input" type="search" placeholder="Cari stasiun radio (mis. Lofi, Jazz, Pop)..." />
-          <div class="scroll-list" id="radio-list">
-            <div class="list-item"><div class="list-item-text"><strong>Memuat daftar radio...</strong></div></div>
-          </div>
+          <label class="sr-only" for="radio-search" data-i18n="radio_search_label">Cari stasiun radio</label>
+          <input id="radio-search" class="filter-input" type="search" placeholder="Cari stasiun radio (mis. Lofi, Jazz, Pop)..." disabled />
+          <div class="sr-only" id="radio-sr-status" role="status" aria-live="polite"></div>
+          <div class="scroll-list" id="radio-list"></div>
         </div>
         <div class="list-box">
           <div class="list-box-head">
             <h3 data-i18n="exp_chart_t">📈 Tangga Lagu HiFi</h3>
             <span class="live-pill" id="chart-count-pill">103 CHARTS</span>
           </div>
-          <input id="chart-search" class="filter-input" type="search" placeholder="Cari negara atau chart (mis. Indonesia, Global, Japan)..." />
-          <div class="scroll-list" id="chart-list">
-            <div class="list-item"><div class="list-item-text"><strong>Memuat daftar tangga lagu...</strong></div></div>
-          </div>
+          <label class="sr-only" for="chart-search" data-i18n="chart_search_label">Cari tangga lagu negara</label>
+          <input id="chart-search" class="filter-input" type="search" placeholder="Cari negara atau chart (mis. Indonesia, Global, Japan)..." disabled />
+          <div class="sr-only" id="chart-sr-status" role="status" aria-live="polite"></div>
+          <div class="scroll-list" id="chart-list"></div>
         </div>
       </div>
     </section>
@@ -1085,24 +1146,27 @@
   </main>
 
   <!-- Lightbox Modal -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" hidden>
     <div class="lightbox-inner">
-      <img id="lightbox-img" class="lightbox-img" src="" alt="Preview Screenshot HiFi" />
+      <h2 id="lightbox-title" class="sr-only" data-i18n="lb_title">Pratinjau tangkapan layar</h2>
+      <div id="lightbox-status" class="sr-only" aria-live="polite"></div>
+      <img id="lightbox-img" class="lightbox-img" alt="Preview Screenshot HiFi" width="360" height="640" />
       <div class="lightbox-controls">
-        <button class="lb-btn" id="lb-prev" type="button">← Prev</button>
-        <button class="lb-btn" id="lb-close" type="button">Tutup</button>
-        <button class="lb-btn" id="lb-next" type="button">Next →</button>
+        <button class="lb-btn" id="lb-prev" type="button" data-i18n="lb_prev">← Prev</button>
+        <button class="lb-btn" id="lb-close" type="button" data-i18n="lb_close">Tutup</button>
+        <button class="lb-btn" id="lb-next" type="button" data-i18n="lb_next">Next →</button>
       </div>
     </div>
   </div>
 
   <!-- QR Download Modal -->
-  <div class="lightbox" id="qr-modal" role="dialog" aria-modal="true">
+  <div class="lightbox" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title" hidden>
     <div class="qr-card">
-      <h3 style="font-size:1.15rem;font-weight:900;" data-i18n="qr_title">Scan untuk Unduh di HP</h3>
+      <h3 id="qr-modal-title" style="font-size:1.15rem;font-weight:900;" data-i18n="qr_title">Scan untuk Unduh di HP</h3>
       <p style="font-size:0.84rem;color:var(--muted);margin-top:6px;" data-i18n="qr_sub">Arahkan kamera HP Android ke QR Code ini untuk langsung mengunduh APK HiFi terbaru.</p>
       <div class="qr-box">
-        <img id="qr-img" src="" alt="QR Code Download HiFi APK" />
+        <div id="qr-loading" class="qr-status" data-i18n="qr_loading">Membuat QR Code...</div>
+        <canvas id="qr-canvas" width="200" height="200" role="img" aria-label="QR Code Download HiFi APK" hidden></canvas>
       </div>
       <div>
         <button class="lb-btn" id="qr-close" type="button" data-i18n="qr_close">Tutup</button>
@@ -1123,9 +1187,22 @@
     </div>
   </footer>
 
+  <script src="assets/qr.js"></script>
   <script>
+    "use strict";
+
+    const APP_LINK_PATHS = new Set([
+      "notification", "watch", "playlist", "channel", "c",
+      "album", "library", "analytics", "taste"
+    ]);
+    const WATCH_ALIASES = new Set(["track", "song", "video", "v"]);
+    const SITE_URL = "https://saferill.github.io/HiFi-web/";
+    const RELEASES_FALLBACK_URL = "https://github.com/saferill/HiFi/releases/latest";
+
     const I18N = {
       id: {
+        doc_title: "HiFi [HI-RES] — Pemutar Musik Open-Source Tanpa Iklan",
+        doc_desc: "HiFi adalah pemutar musik open-source bebas iklan untuk Android & Desktop dengan audio jernih, lirik sinkronisasi, Live Radio 24/7, dan Tangga Lagu 100+ negara.",
         nav_preview: "Tampilan",
         nav_features: "Fitur",
         nav_live: "Radio & Chart",
@@ -1134,18 +1211,36 @@
         nav_faq: "FAQ",
         tab_android: "📱 Android (APK)",
         tab_desktop: "💻 Desktop",
+        download_btn_idle: "Unduh APK Terbaru (Otomatis Sesuai HP)",
+        download_btn_ready: "Unduh HiFi {tag} ({abi} • {size} MB)",
+        version_detecting: "Mendeteksi versi terbaru & arsitektur perangkat...",
+        version_ready_auto: "Versi terbaru: {tag} • Dipilih otomatis untuk {abi}",
+        version_ready_rec: "Versi terbaru: {tag} • {abi} direkomendasikan untuk mayoritas HP Android — pilih Universal APK bila gagal dipasang",
+        version_desktop_hint: "Versi terbaru: {tag} • Perangkat Desktop terdeteksi — buka tab Desktop atau pilih APK untuk HP Android",
+        version_fallback: "Rekomendasi arsitektur: {abi} (pilih Universal APK jika ragu)",
+        abi_arm64: "arm64-v8a (Modern)",
+        abi_armv7: "armeabi-v7a (32-bit)",
+        abi_x86_64: "x86_64 (64-bit)",
+        abi_universal: "Universal APK (Semua HP)",
         desktop_checking: "Memeriksa installer Desktop (Windows / macOS / Linux) di rilis terbaru...",
+        desktop_found: "Installer Desktop tersedia pada rilis <strong>{dTag}</strong>:",
+        desktop_found_older: "Installer Desktop tersedia pada rilis <strong>{dTag}</strong> (rilis {latestTag} khusus Android):",
+        desktop_none: "Belum ada installer Desktop di rilis terbaru. Jalankan dari source via Gradle: <code>./gradlew :composeApp:run</code>",
+        desktop_error: "Gagal memeriksa installer Desktop. Buka halaman Semua Rilis di GitHub.",
+        desktop_rate_limit: "Batas permintaan GitHub API tercapai, coba beberapa saat lagi.",
         desktop_build_btn: "Panduan Build dari Source",
         hero_pill: "Open-Source (GPL-3.0) • Bebas Iklan • F-Droid Pending",
         hero_title: 'Streaming Musik <span>Hi-Res</span> Tanpa Iklan &amp; Batas.',
         hero_desc: "Pemutar musik modern untuk Android & Desktop dengan lirik sinkronisasi real-time, terjemahan AI, Radio Live 24/7, dan Tangga Lagu 100+ negara.",
         deeplink_text: "Membuka tautan di aplikasi HiFi...",
+        deeplink_opening_item: "Membuka {label} di aplikasi HiFi...",
         deeplink_btn: "Buka di Aplikasi HiFi",
         all_releases: "Semua Rilis",
         stat_radio: "Stasiun Radio Live 24/7",
         stat_charts: "Tangga Lagu Negara",
         stat_ads: "Iklan & Pop-up Mengganggu",
         stat_oss: "Lisensi Open-Source",
+        stat_live_unavailable: "Daftar live sementara tidak tersedia",
         prev_heading: "Intip Tampilan Aplikasi HiFi",
         prev_sub: "Desain bersih, responsif, dan nyaman dipakai di layar Android maupun Desktop. Klik gambar untuk melihat lebih jelas.",
         feat_heading: "Semua yang Kamu Butuhkan dalam Satu Pemutar Musik",
@@ -1166,8 +1261,38 @@
         exp_sub: "Data di bawah dimuat langsung dari ekosistem GitHub HiFi yang diperbarui otomatis setiap 2 jam.",
         exp_radio_t: "📻 Radio Live 24/7",
         exp_chart_t: "📈 Tangga Lagu HiFi",
+        radio_search_label: "Cari stasiun radio",
+        radio_search_ph: "Cari stasiun radio (mis. Lofi, Jazz, Pop)...",
+        radio_loading: "Memuat daftar radio...",
+        radio_empty_data: "Daftar radio live sedang kosong. Bot auto-heal HiFi memverifikasi ulang tautan setiap 2 jam — coba lagi sebentar.",
+        radio_no_match: "Tidak ada radio yang cocok dengan pencarianmu.",
+        radio_error: "Gagal memuat daftar radio.",
+        radio_rate_limit: "Batas permintaan tercapai, coba beberapa saat lagi.",
+        radio_retry: "Coba lagi",
+        radio_open_hifi: "Buka di aplikasi HiFi",
+        radio_live_badge: "LIVE",
+        radio_sr_count: "{count} stasiun radio ditemukan.",
+        chart_search_label: "Cari tangga lagu negara",
+        chart_search_ph: "Cari negara atau chart (mis. Indonesia, Global, Japan)...",
+        chart_loading: "Memuat daftar tangga lagu...",
+        chart_empty_data: "Daftar tangga lagu sedang kosong. Bot sinkronisasi memperbarui katalog setiap 2 jam — coba lagi sebentar.",
+        chart_no_match: "Tidak ada chart yang cocok dengan pencarianmu.",
+        chart_error: "Gagal memuat daftar tangga lagu.",
+        chart_rate_limit: "Batas permintaan tercapai, coba beberapa saat lagi.",
+        chart_retry: "Coba lagi",
+        chart_open_hifi: "Buka di aplikasi HiFi",
+        chart_sr_count: "{count} tangga lagu ditemukan.",
+        chart_count_suffix: "CHARTS",
         chg_heading: "Riwayat Rilis & Pembaruan Terbaru",
         chg_sub: "Catatan rilis dimuat otomatis dari GitHub Releases resmi saferill/HiFi.",
+        changelog_loading: "Memuat rilis terbaru...",
+        changelog_empty: "Belum ada rilis tersedia.",
+        changelog_error: "Gagal memuat riwayat rilis.",
+        changelog_rate_limit: "Batas permintaan GitHub API tercapai, coba beberapa saat lagi.",
+        changelog_fallback_body: "Pembaruan performa dan perbaikan bug.",
+        changelog_latest: "TERBARU",
+        changelog_view_gh: "Lihat detail di GitHub →",
+        changelog_open_gh: "Buka GitHub Releases →",
         gp_heading: "Panduan Instalasi & Kebijakan Privasi",
         gp_sub: "Langkah cepat memasang APK di Android dan komitmen transparansi privasi HiFi Music.",
         guide_title: "📲 Cara Pasang APK di Android",
@@ -1187,7 +1312,18 @@
         qr_btn: "📱 Scan QR di HP",
         qr_title: "Scan untuk Unduh di HP",
         qr_sub: "Arahkan kamera HP Android ke QR Code ini untuk langsung mengunduh APK HiFi terbaru.",
+        qr_loading: "Membuat QR Code...",
+        qr_failed: "Gagal membuat QR Code.",
+        qr_canvas_alt: "QR Code untuk mengunduh APK HiFi",
         qr_close: "Tutup",
+        lb_title: "Pratinjau tangkapan layar",
+        lb_prev: "← Sebelumnya",
+        lb_close: "Tutup",
+        lb_next: "Berikutnya →",
+        lb_status: "Gambar {current} dari {total}",
+        lb_alt: "Tangkapan layar HiFi {current}: {name}",
+        phone_zoom_label: "Perbesar tangkapan layar 1: Beranda HiFi",
+        shot_zoom_label: "Perbesar tangkapan layar {num}: {name}",
         faq_heading: "Pertanyaan yang Sering Diajukan",
         q1: "Apakah HiFi gratis dan bebas iklan?",
         a1: "Ya, HiFi 100% gratis, open-source (GPL-3.0), dan tidak memiliki iklan banner, pop-up iklan, maupun pelacak komersial.",
@@ -1199,6 +1335,8 @@
         a4: "Bot otomatis di GitHub Actions mengecek dan menyembuhkan link radio serta tangga lagu setiap 2 jam sekali. Cukup tutup dan buka ulang aplikasi untuk menyegarkan cache."
       },
       en: {
+        doc_title: "HiFi [HI-RES] — Ad-Free Open-Source Music Player",
+        doc_desc: "HiFi is an ad-free open-source music player for Android & Desktop with crisp audio, synced lyrics, 24/7 Live Radio, and 100+ country charts.",
         nav_preview: "Preview",
         nav_features: "Features",
         nav_live: "Radio & Charts",
@@ -1207,18 +1345,36 @@
         nav_faq: "FAQ",
         tab_android: "📱 Android (APK)",
         tab_desktop: "💻 Desktop",
+        download_btn_idle: "Download Latest APK (Best Match)",
+        download_btn_ready: "Download HiFi {tag} ({abi} • {size} MB)",
+        version_detecting: "Detecting latest release & device architecture...",
+        version_ready_auto: "Latest release: {tag} • Auto-selected for {abi}",
+        version_ready_rec: "Latest release: {tag} • {abi} is recommended for most Android phones — pick Universal APK if installation fails",
+        version_desktop_hint: "Latest release: {tag} • Desktop device detected — switch to the Desktop tab or pick an APK for Android",
+        version_fallback: "Recommended architecture: {abi} (pick Universal APK if unsure)",
+        abi_arm64: "arm64-v8a (Modern)",
+        abi_armv7: "armeabi-v7a (32-bit)",
+        abi_x86_64: "x86_64 (64-bit)",
+        abi_universal: "Universal APK (All Phones)",
         desktop_checking: "Checking Desktop installers (Windows / macOS / Linux) in latest release...",
+        desktop_found: "Desktop installer available on <strong>{dTag}</strong>:",
+        desktop_found_older: "Desktop installer available on <strong>{dTag}</strong> ({latestTag} is Android-only):",
+        desktop_none: "No Desktop installer in recent releases yet. Run from source via Gradle: <code>./gradlew :composeApp:run</code>",
+        desktop_error: "Could not check Desktop installers. Open All Releases on GitHub.",
+        desktop_rate_limit: "GitHub API rate limit reached, please try again shortly.",
         desktop_build_btn: "Build from Source Guide",
         hero_pill: "Open-Source (GPL-3.0) • Ad-Free • F-Droid Pending",
         hero_title: 'Ad-Free <span>Hi-Res</span> Music Streaming Without Limits.',
         hero_desc: "Modern open-source music player for Android & Desktop with real-time synced lyrics, smart translation, 24/7 Live Radio, and 100+ country charts.",
         deeplink_text: "Opening content in HiFi app...",
+        deeplink_opening_item: "Opening {label} in the HiFi app...",
         deeplink_btn: "Open in HiFi App",
         all_releases: "All Releases",
         stat_radio: "24/7 Live Radio Stations",
         stat_charts: "Country Music Charts",
         stat_ads: "Ads & Annoying Pop-ups",
         stat_oss: "Open-Source License",
+        stat_live_unavailable: "Live list temporarily unavailable",
         prev_heading: "Inside the HiFi App",
         prev_sub: "Clean, responsive, and crafted for everyday listening on Android and Desktop. Click any screenshot to zoom in.",
         feat_heading: "Everything You Need in One Music Player",
@@ -1239,8 +1395,38 @@
         exp_sub: "Loaded live from HiFi's GitHub ecosystem, automatically synchronized every 2 hours.",
         exp_radio_t: "📻 24/7 Live Radio",
         exp_chart_t: "📈 HiFi Music Charts",
+        radio_search_label: "Search radio stations",
+        radio_search_ph: "Search radio stations (e.g. Lofi, Jazz, Pop)...",
+        radio_loading: "Loading radio stations...",
+        radio_empty_data: "Live radio list is currently empty. HiFi's auto-heal bot re-verifies links every 2 hours — please check back soon.",
+        radio_no_match: "No radio stations match your search.",
+        radio_error: "Failed to load radio stations.",
+        radio_rate_limit: "Rate limit reached, please try again shortly.",
+        radio_retry: "Retry",
+        radio_open_hifi: "Open in HiFi app",
+        radio_live_badge: "LIVE",
+        radio_sr_count: "{count} radio stations found.",
+        chart_search_label: "Search country charts",
+        chart_search_ph: "Search country or chart (e.g. Indonesia, Global, Japan)...",
+        chart_loading: "Loading music charts...",
+        chart_empty_data: "Chart list is currently empty. The sync bot refreshes the catalog every 2 hours — please check back soon.",
+        chart_no_match: "No charts match your search.",
+        chart_error: "Failed to load music charts.",
+        chart_rate_limit: "Rate limit reached, please try again shortly.",
+        chart_retry: "Retry",
+        chart_open_hifi: "Open in HiFi app",
+        chart_sr_count: "{count} charts found.",
+        chart_count_suffix: "CHARTS",
         chg_heading: "Latest Releases &amp; Changelog",
         chg_sub: "Release notes fetched automatically from official saferill/HiFi GitHub Releases.",
+        changelog_loading: "Loading latest releases...",
+        changelog_empty: "No releases found.",
+        changelog_error: "Failed to load release history.",
+        changelog_rate_limit: "GitHub API rate limit reached, please try again shortly.",
+        changelog_fallback_body: "Performance improvements and bug fixes.",
+        changelog_latest: "LATEST",
+        changelog_view_gh: "View release on GitHub →",
+        changelog_open_gh: "Open GitHub Releases →",
         gp_heading: "Installation Guide &amp; Privacy Policy",
         gp_sub: "Quick steps to install the Android APK and HiFi Music's privacy commitment.",
         guide_title: "📲 How to Install APK on Android",
@@ -1260,7 +1446,18 @@
         qr_btn: "📱 Scan QR on Phone",
         qr_title: "Scan to Download on Phone",
         qr_sub: "Point your Android phone camera at this QR code to download the latest HiFi APK.",
+        qr_loading: "Generating QR Code...",
+        qr_failed: "Failed to generate QR Code.",
+        qr_canvas_alt: "QR Code to download HiFi APK",
         qr_close: "Close",
+        lb_title: "Screenshot preview",
+        lb_prev: "← Prev",
+        lb_close: "Close",
+        lb_next: "Next →",
+        lb_status: "Image {current} of {total}",
+        lb_alt: "HiFi Screenshot {current}: {name}",
+        phone_zoom_label: "Enlarge screenshot 1: HiFi Home",
+        shot_zoom_label: "Enlarge screenshot {num}: {name}",
         faq_heading: "Frequently Asked Questions",
         q1: "Is HiFi completely free and ad-free?",
         a1: "Yes. HiFi is 100% free, open-source (GPL-3.0), with zero banner ads, ad pop-ups, or commercial trackers.",
@@ -1273,283 +1470,903 @@
       }
     };
 
-    let currentLang = (navigator.language || "id").toLowerCase().startsWith("id") ? "id" : "en";
+    const state = {
+      lang: (navigator.language || "id").toLowerCase().startsWith("id") ? "id" : "en",
+      abi: "arm64-v8a",
+      abiDetected: false,
+      isDesktopPlatform: false,
+      releasesStatus: "loading",
+      releasesErrorType: null,
+      releases: [],
+      bestApk: null,
+      abiUrls: {},
+      latestTag: "",
+      desktopTag: "",
+      desktopAssets: [],
+      radioStatus: "loading",
+      radioErrorType: null,
+      stations: [],
+      radioQuery: "",
+      chartStatus: "loading",
+      chartErrorType: null,
+      charts: [],
+      chartQuery: "",
+      activePlatform: "android",
+      deeplink: null,
+      activeModal: null,
+      lastTrigger: null,
+      activeShot: 0
+    };
 
-    function applyLang(lang) {
-      currentLang = lang;
-      const dict = I18N[lang];
-      document.documentElement.lang = lang;
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (dict[key]) el.innerHTML = dict[key];
-      });
-      document.getElementById("radio-search").placeholder = lang === "id"
-        ? "Cari stasiun radio (mis. Lofi, Jazz, Pop)..."
-        : "Search radio stations (e.g. Lofi, Jazz, Pop)...";
-      document.getElementById("chart-search").placeholder = lang === "id"
-        ? "Cari negara atau chart (mis. Indonesia, Global, Japan)..."
-        : "Search country or chart (e.g. Indonesia, Global, Japan)...";
+    function t(key, vars) {
+      const dict = I18N[state.lang] || I18N.id;
+      let str = dict[key] || "";
+      if (vars) {
+        Object.keys(vars).forEach((k) => {
+          str = str.replace(new RegExp(`\\{${k}\\}`, "g"), String(vars[k]));
+        });
+      }
+      return str;
     }
-
-    document.getElementById("lang-toggle").addEventListener("click", () => {
-      applyLang(currentLang === "id" ? "en" : "id");
-    });
-    applyLang(currentLang);
-
-    // Screenshot Lightbox
-    const shots = [
-      "assets/screenshots/1.png",
-      "assets/screenshots/2.png",
-      "assets/screenshots/3.png",
-      "assets/screenshots/4.png",
-      "assets/screenshots/5.png",
-      "assets/screenshots/6.png",
-      "assets/screenshots/7.png"
-    ];
-    let activeShot = 0;
-    const lightbox = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lightbox-img");
-
-    function openShot(idx) {
-      activeShot = (idx + shots.length) % shots.length;
-      lbImg.src = shots[activeShot];
-      lightbox.classList.add("open");
-    }
-    document.querySelectorAll("[data-shot-index]").forEach(el => {
-      el.addEventListener("click", () => openShot(Number(el.dataset.shotIndex)));
-    });
-    document.getElementById("lb-prev").addEventListener("click", () => openShot(activeShot - 1));
-    document.getElementById("lb-next").addEventListener("click", () => openShot(activeShot + 1));
-    document.getElementById("lb-close").addEventListener("click", () => lightbox.classList.remove("open"));
-    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.classList.remove("open"); });
-    document.addEventListener("keydown", (e) => {
-      if (!lightbox.classList.contains("open")) return;
-      if (e.key === "Escape") lightbox.classList.remove("open");
-      if (e.key === "ArrowLeft") openShot(activeShot - 1);
-      if (e.key === "ArrowRight") openShot(activeShot + 1);
-    });
-
-    // QR Modal
-    const qrModal = document.getElementById("qr-modal");
-    const qrImg = document.getElementById("qr-img");
-    document.getElementById("qr-btn").addEventListener("click", () => {
-      const targetUrl = document.getElementById("download-btn").href || "https://saferill.github.io/HiFi-web/";
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodeURIComponent(targetUrl)}`;
-      qrModal.classList.add("open");
-    });
-    document.getElementById("qr-close").addEventListener("click", () => qrModal.classList.remove("open"));
-    qrModal.addEventListener("click", (e) => { if (e.target === qrModal) qrModal.classList.remove("open"); });
-
-    // Platform Tabs (Android / Desktop)
-    document.querySelectorAll(".platform-tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.platform;
-        document.querySelectorAll(".platform-tab").forEach(t => t.classList.toggle("active", t === tab));
-        document.querySelectorAll(".platform-panel").forEach(p => p.classList.toggle("active", p.id === `panel-${target}`));
-      });
-    });
 
     function escapeHtml(str) {
-      return String(str || "")
+      return String(str == null ? "" : str)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function safeUrl(raw, { allow = ["https:", "http:"] } = {}) {
+      if (!raw || typeof raw !== "string") return "";
+      try {
+        const parsed = new URL(raw.trim());
+        if (!allow.includes(parsed.protocol.toLowerCase())) return "";
+        return parsed.toString();
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function isValidArg(val) {
+      return typeof val === "string" && val.length > 0 && val.length <= 128 && !/[\x00-\x1f\s]/.test(val);
+    }
+
+    function encodeQueryPairs(pairs) {
+      if (!pairs.length) return "";
+      return "?" + pairs.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&");
+    }
+
+    function buildAppUri(appPath, pairs = [], pathSegs = []) {
+      const normPath = String(appPath || "").toLowerCase();
+      if (!APP_LINK_PATHS.has(normPath)) return "";
+      const segs = pathSegs.filter(isValidArg).map(encodeURIComponent).join("/");
+      const target = normPath + (segs ? "/" + segs : "") + encodeQueryPairs(pairs);
+      return { target, appUri: "HiFi://" + target };
+    }
+
+    function isAndroidIntentBrowser() {
+      const ua = navigator.userAgent || "";
+      return /Android/i.test(ua) && /(Chrome|EdgA|Firefox|SamsungBrowser)/i.test(ua);
+    }
+
+    function buildLaunchUri(resolved) {
+      if (!resolved) return "";
+      if (isAndroidIntentBrowser()) {
+        return `intent://${resolved.target}#Intent;scheme=hifi;package=com.hifi.music;S.browser_fallback_url=${encodeURIComponent(SITE_URL + "?from=deeplink")};end`;
+      }
+      return resolved.appUri;
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function parseAppRoute(pathPart, searchPart) {
+      const stripped = String(pathPart || "").replace(/^\/HiFi-web(?=\/|$)/, "").replace(/^\/+/, "");
+      const raw = stripped.startsWith("app/") ? stripped.slice(4) : stripped;
+      const parts = raw.split("/").filter(Boolean).map((s) => {
+        try { return decodeURIComponent(s); } catch (e) { return s; }
+      });
+      if (!parts.length) return null;
+
+      const head = parts[0].toLowerCase();
+      const tail = parts.slice(1);
+      const incoming = new URLSearchParams(searchPart || "");
+      const pairs = [];
+
+      if (WATCH_ALIASES.has(head)) {
+        const vParam = incoming.get("v");
+        const id = isValidArg(vParam) ? vParam : (isValidArg(tail[0]) ? tail[0] : "");
+        if (!id) return null;
+        pairs.push(["v", id]);
+        incoming.forEach((v, k) => { if (k !== "v") pairs.push([k, v]); });
+        return { ...buildAppUri("watch", pairs), label: `watch (${id})` };
+      }
+
+      if (head === "playlist" && tail.length > 0 && !incoming.has("list")) {
+        if (!isValidArg(tail[0])) return null;
+        pairs.push(["list", tail[0]]);
+        incoming.forEach((v, k) => pairs.push([k, v]));
+        return { ...buildAppUri("playlist", pairs), label: `playlist (${tail[0]})` };
+      }
+
+      if (APP_LINK_PATHS.has(head)) {
+        const segs = tail.filter(isValidArg);
+        if ((head === "channel" || head === "c" || head === "album") && !segs.length && !incoming.toString()) {
+          return null;
+        }
+        if (head === "watch" && incoming.has("v")) {
+          const qv = incoming.get("v");
+          if (!isValidArg(qv)) return null;
+          pairs.push(["v", qv]);
+          incoming.forEach((v, k) => { if (k !== "v") pairs.push([k, v]); });
+        } else {
+          incoming.forEach((v, k) => pairs.push([k, v]));
+        }
+        return { ...buildAppUri(head, pairs, segs), label: segs[0] ? `${head} (${segs[0]})` : head };
+      }
+      return null;
+    }
+
+    function resolveDeepLink() {
+      const loc = window.location;
+      const params = new URLSearchParams(loc.search);
+      let resolved = null;
+      let shouldCleanUrl = false;
+
+      if (/^(\/HiFi-web)?\/app\//.test(loc.pathname)) {
+        resolved = parseAppRoute(loc.pathname, loc.search);
+        shouldCleanUrl = true;
+      } else if (params.has("v") && isValidArg(params.get("v"))) {
+        const pairs = [["v", params.get("v")]];
+        params.forEach((v, k) => { if (k !== "v" && k !== "from") pairs.push([k, v]); });
+        resolved = { ...buildAppUri("watch", pairs), label: `watch (${params.get("v")})` };
+        shouldCleanUrl = true;
+      } else if (params.has("list") && isValidArg(params.get("list"))) {
+        const pairs = [["list", params.get("list")]];
+        params.forEach((v, k) => { if (k !== "list" && k !== "from") pairs.push([k, v]); });
+        resolved = { ...buildAppUri("playlist", pairs), label: `playlist (${params.get("list")})` };
+        shouldCleanUrl = true;
+      } else if (params.has("track") && isValidArg(params.get("track"))) {
+        resolved = { ...buildAppUri("watch", [["v", params.get("track")]]), label: `watch (${params.get("track")})` };
+        shouldCleanUrl = true;
+      } else if (params.has("app") || params.has("deeplink")) {
+        const rawTarget = (params.get("app") || params.get("deeplink") || "").replace(/^HiFi:\/\//i, "").replace(/^hifi:\/\//i, "");
+        const [p, q] = rawTarget.split("?");
+        resolved = parseAppRoute(p, q ? "?" + q : "");
+        shouldCleanUrl = true;
+      } else if (loc.hash) {
+        const h = loc.hash.slice(1);
+        const stripped = h.startsWith("app/") ? h.slice(4) : h;
+        const [hp, hq] = stripped.split("?");
+        const candidate = parseAppRoute(hp, hq ? "?" + hq : "");
+        if (candidate) {
+          resolved = candidate;
+          shouldCleanUrl = true;
+        }
+      }
+
+      if (resolved) {
+        state.deeplink = resolved;
+        renderDeepLinkBox();
+        if (shouldCleanUrl && window.history && window.history.replaceState) {
+          const cleanPath = loc.pathname.startsWith("/HiFi-web") ? "/HiFi-web/" : "/";
+          window.history.replaceState(null, "", cleanPath);
+        }
+        if (!sessionStorage.getItem("hifi_dl_tried")) {
+          sessionStorage.setItem("hifi_dl_tried", "1");
+          window.location.href = buildLaunchUri(resolved);
+        }
+      }
+    }
+
+    function renderDeepLinkBox() {
+      const box = document.getElementById("deeplink-box");
+      const textEl = document.getElementById("deeplink-text");
+      const btn = document.getElementById("open-app-btn");
+      if (!state.deeplink) {
+        box.style.display = "none";
+        return;
+      }
+      box.style.display = "block";
+      textEl.textContent = t("deeplink_opening_item", { label: state.deeplink.label });
+      btn.href = buildLaunchUri(state.deeplink);
+      btn.textContent = t("deeplink_btn");
+    }
+
+    function renderHero() {
+      const btn = document.getElementById("download-btn");
+      const info = document.getElementById("version-info");
+      const abiLinks = document.querySelectorAll("#abi-pills a[data-abi]");
+
+      const abiLabels = {
+        "arm64-v8a": t("abi_arm64"),
+        "armeabi-v7a": t("abi_armv7"),
+        "x86_64": t("abi_x86_64"),
+        "universal": t("abi_universal")
+      };
+
+      abiLinks.forEach((link) => {
+        const a = link.dataset.abi;
+        link.textContent = abiLabels[a] || a;
+        link.classList.toggle("active", !state.isDesktopPlatform && state.abiDetected && a === state.abi);
+        link.href = state.abiUrls[a] || RELEASES_FALLBACK_URL;
+      });
+
+      if (state.releasesStatus === "loading") {
+        btn.href = RELEASES_FALLBACK_URL;
+        btn.textContent = t("download_btn_idle");
+        info.textContent = t("version_detecting");
+        return;
+      }
+
+      if (state.releasesStatus === "ready" && state.bestApk) {
+        const sizeMb = (state.bestApk.size / (1024 * 1024)).toFixed(1);
+        btn.href = safeUrl(state.bestApk.browser_download_url) || RELEASES_FALLBACK_URL;
+        btn.textContent = t("download_btn_ready", {
+          tag: state.latestTag,
+          abi: state.abi,
+          size: sizeMb
+        });
+        if (state.isDesktopPlatform) {
+          info.textContent = t("version_desktop_hint", { tag: state.latestTag });
+        } else if (state.abiDetected) {
+          info.textContent = t("version_ready_auto", { tag: state.latestTag, abi: state.abi });
+        } else {
+          info.textContent = t("version_ready_rec", { tag: state.latestTag, abi: state.abi });
+        }
+      } else {
+        btn.href = `https://github.com/saferill/HiFi/releases/latest/download/androidApp-${encodeURIComponent(state.abi)}-release.apk`;
+        btn.textContent = t("download_btn_idle");
+        info.textContent = t("version_fallback", { abi: state.abi });
+      }
+    }
+
+    function renderDesktop() {
+      const desktopStatus = document.getElementById("desktop-status");
+      const desktopActions = document.getElementById("desktop-actions");
+      const staticBtns = `
+        <a class="btn btn-secondary" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener">${escapeHtml(t("all_releases"))}</a>
+        <a class="btn btn-secondary" href="https://github.com/saferill/HiFi#build" target="_blank" rel="noopener">${escapeHtml(t("desktop_build_btn"))}</a>
+      `;
+
+      if (state.releasesStatus === "loading") {
+        desktopStatus.textContent = t("desktop_checking");
+        desktopActions.innerHTML = staticBtns;
+        return;
+      }
+
+      if (state.releasesStatus === "error") {
+        desktopStatus.textContent = state.releasesErrorType === "rate_limit"
+          ? t("desktop_rate_limit")
+          : t("desktop_error");
+        desktopActions.innerHTML = staticBtns;
+        return;
+      }
+
+      if (state.desktopAssets.length > 0) {
+        const isOlder = state.desktopTag !== state.latestTag;
+        desktopStatus.innerHTML = isOlder
+          ? t("desktop_found_older", { dTag: escapeHtml(state.desktopTag), latestTag: escapeHtml(state.latestTag) })
+          : t("desktop_found", { dTag: escapeHtml(state.desktopTag) });
+
+        const links = state.desktopAssets.map((a) => {
+          const href = safeUrl(a.browser_download_url);
+          if (!href) return "";
+          const sizeMb = (a.size / (1024 * 1024)).toFixed(1);
+          return `<a class="btn btn-primary" href="${escapeHtml(href)}">${escapeHtml(a.name)} (${sizeMb} MB)</a>`;
+        }).join("");
+        desktopActions.innerHTML = links + staticBtns;
+      } else {
+        desktopStatus.innerHTML = t("desktop_none");
+        desktopActions.innerHTML = staticBtns;
+      }
     }
 
     function formatReleaseBody(body) {
-      const lines = escapeHtml(body || "Pembaruan performa dan perbaikan bug.")
+      const lines = escapeHtml(body || t("changelog_fallback_body"))
         .split(/\r?\n/)
-        .map(l => l.trim())
+        .map((l) => l.trim())
         .filter(Boolean)
         .slice(0, 12);
-      const items = lines.map(l => {
+      const items = lines.map((l) => {
         const clean = l.replace(/^[-*•]\s+/, "").replace(/^#+\s+/, "");
         return `<li>${clean}</li>`;
       }).join("");
       return `<ul>${items}</ul>`;
     }
 
-    // Unified GitHub Releases Fetch (Android APK + Desktop + Changelog)
-    (async function () {
-      const ua = navigator.userAgent.toLowerCase();
-      let abi = "arm64-v8a";
-      if (ua.includes("x86_64") || ua.includes("amd64")) abi = "x86_64";
-      else if (ua.includes("armeabi") || ua.includes("armv7")) abi = "armeabi-v7a";
+    function renderChangelog() {
+      const grid = document.getElementById("changelog-grid");
+      if (state.releasesStatus === "loading") {
+        grid.innerHTML = `<div class="release-card"><div class="release-tag">${escapeHtml(t("changelog_loading"))}</div></div>`;
+        return;
+      }
+      if (state.releasesStatus === "error") {
+        const msg = state.releasesErrorType === "rate_limit" ? t("changelog_rate_limit") : t("changelog_error");
+        grid.innerHTML = `<div class="release-card"><p style="color:var(--muted);font-size:0.88rem;">${escapeHtml(msg)}</p><a class="release-link" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener">${escapeHtml(t("changelog_open_gh"))}</a></div>`;
+        return;
+      }
+      if (!state.releases.length) {
+        grid.innerHTML = `<div class="release-card"><div class="release-tag">${escapeHtml(t("changelog_empty"))}</div></div>`;
+        return;
+      }
 
-      const btn = document.getElementById("download-btn");
-      const info = document.getElementById("version-info");
-      const pills = document.querySelectorAll(".abi-pill");
-      const desktopStatus = document.getElementById("desktop-status");
-      const desktopActions = document.getElementById("desktop-actions");
-      const changelogGrid = document.getElementById("changelog-grid");
+      const locale = state.lang === "id" ? "id-ID" : "en-US";
+      grid.innerHTML = state.releases.slice(0, 3).map((rel, idx) => {
+        const dateStr = rel.published_at
+          ? new Date(rel.published_at).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })
+          : "";
+        const relUrl = safeUrl(rel.html_url) || "https://github.com/saferill/HiFi/releases";
+        return `
+          <article class="release-card">
+            <div class="release-head">
+              <span class="release-tag">${escapeHtml(rel.tag_name)}</span>
+              ${idx === 0 ? `<span class="live-pill">${escapeHtml(t("changelog_latest"))}</span>` : `<span class="release-date">${escapeHtml(dateStr)}</span>`}
+            </div>
+            <div class="release-notes">${formatReleaseBody(rel.body)}</div>
+            <a class="release-link" href="${escapeHtml(relUrl)}" target="_blank" rel="noopener">
+              ${escapeHtml(t("changelog_view_gh"))}
+            </a>
+          </article>
+        `;
+      }).join("");
+    }
 
-      pills.forEach(p => {
-        if (p.dataset.abi === abi) p.classList.add("active");
+    function renderStats() {
+      const rStat = document.getElementById("stat-radios");
+      const rPill = document.getElementById("radio-count-pill");
+      const rNote = document.getElementById("stat-radio-note");
+      if (state.radioStatus === "ready" && state.stations.length > 0) {
+        rStat.textContent = String(state.stations.length);
+        rPill.textContent = `${state.stations.length} LIVE`;
+        rNote.hidden = true;
+      } else {
+        rStat.textContent = "14";
+        rPill.textContent = "14 LIVE";
+        if (state.radioStatus === "empty" || state.radioStatus === "error") {
+          rNote.textContent = t("stat_live_unavailable");
+          rNote.hidden = false;
+        } else {
+          rNote.hidden = true;
+        }
+      }
+
+      const cStat = document.getElementById("stat-charts");
+      const cPill = document.getElementById("chart-count-pill");
+      if (state.chartStatus === "ready" && state.charts.length > 0) {
+        cStat.textContent = String(state.charts.length);
+        cPill.textContent = `${state.charts.length} ${t("chart_count_suffix")}`;
+      } else {
+        cStat.textContent = "103";
+        cPill.textContent = `103 ${t("chart_count_suffix")}`;
+      }
+    }
+
+    function renderRadios() {
+      const rList = document.getElementById("radio-list");
+      const input = document.getElementById("radio-search");
+      const srStatus = document.getElementById("radio-sr-status");
+
+      if (state.radioStatus === "loading") {
+        input.disabled = true;
+        srStatus.textContent = "";
+        rList.innerHTML = `<div class="list-item"><div class="list-item-text"><strong>${escapeHtml(t("radio_loading"))}</strong></div></div>`;
+        return;
+      }
+
+      if (state.radioStatus === "error") {
+        input.disabled = true;
+        srStatus.textContent = "";
+        const msg = state.radioErrorType === "rate_limit" ? t("radio_rate_limit") : t("radio_error");
+        rList.innerHTML = `
+          <div class="list-item list-item--error">
+            <div class="list-item-text"><strong>${escapeHtml(msg)}</strong></div>
+            <button type="button" class="list-retry-btn" id="radio-retry-btn">${escapeHtml(t("radio_retry"))}</button>
+          </div>
+        `;
+        document.getElementById("radio-retry-btn").addEventListener("click", loadRadios);
+        return;
+      }
+
+      if (state.radioStatus === "empty" || state.stations.length === 0) {
+        input.disabled = true;
+        srStatus.textContent = "";
+        rList.innerHTML = `<div class="list-item"><div class="list-item-text"><small>${escapeHtml(t("radio_empty_data"))}</small></div></div>`;
+        return;
+      }
+
+      input.disabled = false;
+      const term = state.radioQuery.trim().toLowerCase();
+      const filtered = term
+        ? state.stations.filter((s) => (`${s.title || ""} ${s.subtitle || ""}`).toLowerCase().includes(term))
+        : state.stations;
+
+      srStatus.textContent = term ? t("radio_sr_count", { count: filtered.length }) : "";
+
+      if (!filtered.length) {
+        rList.innerHTML = `<div class="list-item"><div class="list-item-text"><small>${escapeHtml(t("radio_no_match"))}</small></div></div>`;
+        return;
+      }
+
+      rList.innerHTML = filtered.map((st) => {
+        const vid = isValidArg(st.videoId) ? st.videoId : "";
+        const appObj = vid ? buildAppUri("watch", [["v", vid]]) : null;
+        const ytUrl = vid ? safeUrl(`https://www.youtube.com/watch?v=${encodeURIComponent(vid)}`) : "";
+        const hifiBtn = appObj
+          ? `<a class="action-pill action-hifi" href="${escapeHtml(appObj.appUri)}" title="${escapeHtml(t("radio_open_hifi"))}">▶ HiFi</a>`
+          : "";
+        const ytBtn = ytUrl
+          ? `<a class="action-pill action-yt" href="${escapeHtml(ytUrl)}" target="_blank" rel="noopener">YouTube</a>`
+          : "";
+        return `
+          <div class="list-item">
+            <div class="list-item-text">
+              <strong>${escapeHtml(st.title)}</strong>
+              <small>${escapeHtml(st.subtitle || t("radio_live_badge"))}</small>
+            </div>
+            <div class="list-actions">
+              ${hifiBtn}
+              ${ytBtn}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCharts() {
+      const cList = document.getElementById("chart-list");
+      const input = document.getElementById("chart-search");
+      const srStatus = document.getElementById("chart-sr-status");
+
+      if (state.chartStatus === "loading") {
+        input.disabled = true;
+        srStatus.textContent = "";
+        cList.innerHTML = `<div class="list-item"><div class="list-item-text"><strong>${escapeHtml(t("chart_loading"))}</strong></div></div>`;
+        return;
+      }
+
+      if (state.chartStatus === "error") {
+        input.disabled = true;
+        srStatus.textContent = "";
+        const msg = state.chartErrorType === "rate_limit" ? t("chart_rate_limit") : t("chart_error");
+        cList.innerHTML = `
+          <div class="list-item list-item--error">
+            <div class="list-item-text"><strong>${escapeHtml(msg)}</strong></div>
+            <button type="button" class="list-retry-btn" id="chart-retry-btn">${escapeHtml(t("chart_retry"))}</button>
+          </div>
+        `;
+        document.getElementById("chart-retry-btn").addEventListener("click", loadCharts);
+        return;
+      }
+
+      if (state.chartStatus === "empty" || state.charts.length === 0) {
+        input.disabled = true;
+        srStatus.textContent = "";
+        cList.innerHTML = `<div class="list-item"><div class="list-item-text"><small>${escapeHtml(t("chart_empty_data"))}</small></div></div>`;
+        return;
+      }
+
+      input.disabled = false;
+      const term = state.chartQuery.trim().toLowerCase();
+      const filtered = term
+        ? state.charts.filter((c) => (`${c.name || ""} ${c.country || ""} ${c.description || ""}`).toLowerCase().includes(term))
+        : state.charts;
+
+      srStatus.textContent = term ? t("chart_sr_count", { count: filtered.length }) : "";
+
+      if (!filtered.length) {
+        cList.innerHTML = `<div class="list-item"><div class="list-item-text"><small>${escapeHtml(t("chart_no_match"))}</small></div></div>`;
+        return;
+      }
+
+      cList.innerHTML = filtered.map((ch) => {
+        const rawYt = safeUrl(ch.youtubeUrl);
+        let listId = ch.playlistId || ch.youtubePlaylistId || "";
+        if (!listId && rawYt) {
+          try { listId = new URL(rawYt).searchParams.get("list") || ""; } catch (e) {}
+        }
+        const validListId = isValidArg(listId) ? listId : "";
+        const appObj = validListId ? buildAppUri("playlist", [["list", validListId]]) : null;
+        const hifiBtn = appObj
+          ? `<a class="action-pill action-hifi" href="${escapeHtml(appObj.appUri)}" title="${escapeHtml(t("chart_open_hifi"))}">▶ HiFi</a>`
+          : "";
+        const countryCode = (ch.country || "YT").toUpperCase();
+        const ytBtn = rawYt
+          ? `<a class="action-pill action-yt" href="${escapeHtml(rawYt)}" target="_blank" rel="noopener">${escapeHtml(countryCode)} ↗</a>`
+          : "";
+        return `
+          <div class="list-item">
+            <div class="list-item-text">
+              <strong>${escapeHtml(ch.name)}</strong>
+              <small>${escapeHtml(ch.description || countryCode)}</small>
+            </div>
+            <div class="list-actions">
+              ${hifiBtn}
+              ${ytBtn}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderAccessibilityLabels() {
+      const phoneBtn = document.querySelector(".phone-frame[data-shot-index]");
+      if (phoneBtn) phoneBtn.setAttribute("aria-label", t("phone_zoom_label"));
+      document.querySelectorAll("#gallery-track .shot-card").forEach((btn) => {
+        const num = Number(btn.dataset.shotIndex) + 1;
+        const name = btn.dataset.shotName || "";
+        btn.setAttribute("aria-label", t("shot_zoom_label", { num, name }));
+      });
+      const qrCanvas = document.getElementById("qr-canvas");
+      if (qrCanvas) qrCanvas.setAttribute("aria-label", t("qr_canvas_alt"));
+    }
+
+    function applyLang(lang) {
+      state.lang = lang;
+      const dict = I18N[lang];
+      document.documentElement.lang = lang;
+      document.title = dict.doc_title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute("content", dict.doc_desc);
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.innerHTML = dict[key];
       });
 
-      try {
-        const res = await fetch("https://api.github.com/repos/saferill/HiFi/releases?per_page=5");
-        if (!res.ok) throw new Error("GitHub API error");
-        const releases = await res.json();
-        const latest = releases[0];
+      document.getElementById("radio-search").placeholder = dict.radio_search_ph;
+      document.getElementById("chart-search").placeholder = dict.chart_search_ph;
 
-        if (latest) {
-          const tag = latest.tag_name || "";
-          const assets = latest.assets || [];
-          const findApk = (arch) =>
-            assets.find(a => a.name.includes(arch) && a.name.endsWith(".apk")) ||
-            assets.find(a => a.name.includes("universal") && a.name.endsWith(".apk")) ||
-            assets.find(a => a.name.endsWith(".apk"));
+      renderDeepLinkBox();
+      renderHero();
+      renderDesktop();
+      renderChangelog();
+      renderStats();
+      renderRadios();
+      renderCharts();
+      renderAccessibilityLabels();
+    }
 
-          const best = findApk(abi);
-          if (best) {
-            const sizeMb = (best.size / (1024 * 1024)).toFixed(1);
-            btn.href = best.browser_download_url;
-            btn.textContent = currentLang === "id"
-              ? `Unduh HiFi ${tag} (${abi} • ${sizeMb} MB)`
-              : `Download HiFi ${tag} (${abi} • ${sizeMb} MB)`;
-            info.textContent = currentLang === "id"
-              ? `Versi terbaru: ${tag} • Dipilih otomatis untuk ${abi}`
-              : `Latest release: ${tag} • Auto-selected for ${abi}`;
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      applyLang(state.lang === "id" ? "en" : "id");
+    });
+
+    // Modal focus & inert management
+    const bgRegions = () => Array.from(document.querySelectorAll("header, main, footer"));
+
+    function getFocusable(container) {
+      return Array.from(
+        container.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      ).filter((el) => !el.hidden && el.offsetParent !== null);
+    }
+
+    function setBackgroundInert(isInert) {
+      bgRegions().forEach((el) => {
+        if ("inert" in el) el.inert = isInert;
+        if (isInert) el.setAttribute("aria-hidden", "true");
+        else el.removeAttribute("aria-hidden");
+      });
+    }
+
+    function openModal(modalEl, triggerEl) {
+      const sbWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (sbWidth > 0) document.body.style.paddingRight = `${sbWidth}px`;
+      document.body.classList.add("no-scroll");
+      state.activeModal = modalEl;
+      state.lastTrigger = triggerEl || document.activeElement;
+      setBackgroundInert(true);
+      modalEl.hidden = false;
+      modalEl.classList.add("open");
+      const focusable = getFocusable(modalEl);
+      if (focusable.length) focusable[0].focus();
+    }
+
+    function closeModal(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.remove("open");
+      modalEl.hidden = true;
+      setBackgroundInert(false);
+      document.body.classList.remove("no-scroll");
+      document.body.style.paddingRight = "";
+      state.activeModal = null;
+      if (state.lastTrigger && typeof state.lastTrigger.focus === "function") {
+        state.lastTrigger.focus();
+      }
+      state.lastTrigger = null;
+    }
+
+    // Screenshot Lightbox
+    const shots = [
+      { src: "assets/screenshots/1.png", name: "Home Screen" },
+      { src: "assets/screenshots/2.png", name: "Search & Moods" },
+      { src: "assets/screenshots/3.png", name: "Now Playing" },
+      { src: "assets/screenshots/4.png", name: "Synced Lyrics" },
+      { src: "assets/screenshots/5.png", name: "Features View" },
+      { src: "assets/screenshots/6.png", name: "Library & Cache" },
+      { src: "assets/screenshots/7.png", name: "Charts & Radio" }
+    ];
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lightbox-img");
+    const lbStatus = document.getElementById("lightbox-status");
+
+    function updateShot(idx) {
+      state.activeShot = (idx + shots.length) % shots.length;
+      const item = shots[state.activeShot];
+      lbImg.src = item.src;
+      lbImg.alt = t("lb_alt", { current: state.activeShot + 1, name: item.name });
+      lbStatus.textContent = t("lb_status", { current: state.activeShot + 1, total: shots.length });
+    }
+
+    function openShot(idx, trigger) {
+      updateShot(idx);
+      openModal(lightbox, trigger);
+    }
+
+    document.querySelectorAll("[data-shot-index]").forEach((el) => {
+      el.addEventListener("click", () => openShot(Number(el.dataset.shotIndex), el));
+    });
+    document.getElementById("lb-prev").addEventListener("click", () => updateShot(state.activeShot - 1));
+    document.getElementById("lb-next").addEventListener("click", () => updateShot(state.activeShot + 1));
+    document.getElementById("lb-close").addEventListener("click", () => closeModal(lightbox));
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeModal(lightbox); });
+
+    // Local QR Modal
+    const qrModal = document.getElementById("qr-modal");
+    const qrCanvas = document.getElementById("qr-canvas");
+    const qrLoading = document.getElementById("qr-loading");
+    document.getElementById("qr-btn").addEventListener("click", (e) => {
+      const targetUrl = (state.bestApk && safeUrl(state.bestApk.browser_download_url)) || SITE_URL;
+      qrCanvas.hidden = true;
+      qrLoading.hidden = false;
+      qrLoading.textContent = t("qr_loading");
+      openModal(qrModal, e.currentTarget);
+      requestAnimationFrame(() => {
+        try {
+          window.HiFiQR.drawToCanvas(qrCanvas, targetUrl, 2);
+          qrLoading.hidden = true;
+          qrCanvas.hidden = false;
+        } catch (err) {
+          console.error("[HiFi-web] QR generation failed:", err);
+          qrLoading.textContent = t("qr_failed");
+        }
+      });
+    });
+    document.getElementById("qr-close").addEventListener("click", () => closeModal(qrModal));
+    qrModal.addEventListener("click", (e) => { if (e.target === qrModal) closeModal(qrModal); });
+
+    document.addEventListener("keydown", (e) => {
+      if (!state.activeModal) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeModal(state.activeModal);
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = getFocusable(state.activeModal);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+        return;
+      }
+      if (state.activeModal === lightbox) {
+        if (e.key === "ArrowLeft") updateShot(state.activeShot - 1);
+        if (e.key === "ArrowRight") updateShot(state.activeShot + 1);
+      }
+    });
+
+    // Platform Tabs (Android / Desktop) with full ARIA keyboard navigation
+    const tabs = Array.from(document.querySelectorAll('.platform-tab[role="tab"]'));
+    function activatePlatformTab(platform, moveFocus = false) {
+      state.activePlatform = platform;
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.platform === platform;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", isActive ? "true" : "false");
+        tab.setAttribute("tabindex", isActive ? "0" : "-1");
+        if (isActive && moveFocus) tab.focus();
+      });
+      document.querySelectorAll('.platform-panel[role="tabpanel"]').forEach((panel) => {
+        const isActive = panel.id === `panel-${platform}`;
+        panel.classList.toggle("active", isActive);
+        panel.hidden = !isActive;
+      });
+    }
+
+    tabs.forEach((tab, idx) => {
+      tab.addEventListener("click", () => activatePlatformTab(tab.dataset.platform, false));
+      tab.addEventListener("keydown", (e) => {
+        let nextIdx = null;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") nextIdx = (idx + 1) % tabs.length;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") nextIdx = (idx - 1 + tabs.length) % tabs.length;
+        else if (e.key === "Home") nextIdx = 0;
+        else if (e.key === "End") nextIdx = tabs.length - 1;
+        if (nextIdx !== null) {
+          e.preventDefault();
+          activatePlatformTab(tabs[nextIdx].dataset.platform, true);
+        }
+      });
+    });
+
+    async function detectDeviceArch() {
+      const ua = navigator.userAgent.toLowerCase();
+      let abi = "arm64-v8a";
+      let detected = false;
+      let isDesktop = false;
+
+      if (navigator.userAgentData && typeof navigator.userAgentData.getHighEntropyValues === "function") {
+        try {
+          const vals = await navigator.userAgentData.getHighEntropyValues(["platform", "architecture", "bitness", "model"]);
+          const plat = (vals.platform || "").toLowerCase();
+          const arch = (vals.architecture || "").toLowerCase();
+          const bit = String(vals.bitness || "");
+          if (["windows", "macos", "linux", "chrome os", "chromeos"].includes(plat)) {
+            isDesktop = true;
           }
-          pills.forEach(p => {
-            const match = findApk(p.dataset.abi);
-            if (match) p.href = match.browser_download_url;
+          if (arch === "arm" && bit === "64") { abi = "arm64-v8a"; detected = true; }
+          else if (arch === "arm" && bit === "32") { abi = "armeabi-v7a"; detected = true; }
+          else if (arch === "x86" && bit === "64") { abi = "x86_64"; detected = true; }
+          else if (arch === "x86" && bit === "32") { abi = "armeabi-v7a"; detected = true; }
+        } catch (e) {
+          // Fallback to UA string parsing below
+        }
+      }
+
+      if (!isDesktop && /(windows nt|macintosh|mac os x|cros|x11; linux)/i.test(ua) && !/android/i.test(ua)) {
+        isDesktop = true;
+      }
+      if (!detected) {
+        if (ua.includes("x86_64") || ua.includes("amd64")) { abi = "x86_64"; detected = true; }
+        else if (ua.includes("armeabi") || ua.includes("armv7")) { abi = "armeabi-v7a"; detected = true; }
+        else if (ua.includes("aarch64") || ua.includes("arm64")) { abi = "arm64-v8a"; detected = true; }
+      }
+
+      state.abi = abi;
+      state.abiDetected = detected;
+      state.isDesktopPlatform = isDesktop;
+      if (isDesktop) activatePlatformTab("desktop", false);
+      renderHero();
+    }
+
+    async function loadReleases() {
+      state.releasesStatus = "loading";
+      state.releasesErrorType = null;
+      renderHero();
+      renderDesktop();
+      renderChangelog();
+
+      try {
+        const res = await fetchWithTimeout("https://api.github.com/repos/saferill/HiFi/releases?per_page=5", {
+          headers: { Accept: "application/vnd.github+json" }
+        });
+        if (!res.ok) {
+          const isRateLimit = res.status === 403 || res.status === 429;
+          throw Object.assign(new Error(`GitHub API HTTP ${res.status}`), { isRateLimit });
+        }
+        const releases = await res.json();
+        state.releases = Array.isArray(releases) ? releases : [];
+        const latest = state.releases[0];
+        if (latest) {
+          state.latestTag = latest.tag_name || "";
+          const assets = Array.isArray(latest.assets) ? latest.assets : [];
+          const findApk = (arch) =>
+            assets.find((a) => a.name && a.name.includes(arch) && a.name.endsWith(".apk")) ||
+            assets.find((a) => a.name && a.name.includes("universal") && a.name.endsWith(".apk")) ||
+            assets.find((a) => a.name && a.name.endsWith(".apk"));
+
+          state.bestApk = findApk(state.abi) || null;
+          ["arm64-v8a", "armeabi-v7a", "x86_64", "universal"].forEach((a) => {
+            const match = findApk(a);
+            if (match && safeUrl(match.browser_download_url)) {
+              state.abiUrls[a] = safeUrl(match.browser_download_url);
+            }
           });
 
-          // Desktop assets check across recent releases
-          const isDesktopAsset = (a) => /\.(exe|msi|dmg|appimage|deb|rpm)$/i.test(a.name);
-          const desktopRelease = releases.find(r => (r.assets || []).some(isDesktopAsset));
+          const isDesktopAsset = (a) => a && a.name && /\.(exe|msi|dmg|appimage|deb|rpm)$/i.test(a.name);
+          const desktopRelease = state.releases.find((r) => (r.assets || []).some(isDesktopAsset));
           if (desktopRelease) {
-            const desktopAssets = desktopRelease.assets.filter(isDesktopAsset);
-            const dTag = desktopRelease.tag_name || "";
-            const isOlder = dTag !== tag;
-            desktopStatus.innerHTML = currentLang === "id"
-              ? `Installer Desktop tersedia pada rilis <strong>${escapeHtml(dTag)}</strong>${isOlder ? ` (rilis ${escapeHtml(tag)} khusus Android)` : ""}:`
-              : `Desktop installer available on <strong>${escapeHtml(dTag)}</strong>${isOlder ? ` (${escapeHtml(tag)} is Android-only)` : ""}:`;
-            const links = desktopAssets.map(a => {
-              const sizeMb = (a.size / (1024 * 1024)).toFixed(1);
-              return `<a class="btn btn-primary" href="${a.browser_download_url}">${escapeHtml(a.name)} (${sizeMb} MB)</a>`;
-            }).join("");
-            desktopActions.innerHTML = links + desktopActions.innerHTML;
+            state.desktopTag = desktopRelease.tag_name || "";
+            state.desktopAssets = (desktopRelease.assets || []).filter(isDesktopAsset);
           } else {
-            desktopStatus.innerHTML = currentLang === "id"
-              ? `Belum ada installer Desktop di rilis terbaru. Jalankan dari source via Gradle: <code>./gradlew :composeApp:run</code>`
-              : `No Desktop installer in recent releases yet. Run from source via Gradle: <code>./gradlew :composeApp:run</code>`;
+            state.desktopTag = "";
+            state.desktopAssets = [];
           }
         }
-
-        // Render Changelog cards (latest 3)
-        if (releases.length > 0) {
-          changelogGrid.innerHTML = releases.slice(0, 3).map((rel, idx) => {
-            const dateStr = rel.published_at
-              ? new Date(rel.published_at).toLocaleDateString(currentLang === "id" ? "id-ID" : "en-US", { year: "numeric", month: "short", day: "numeric" })
-              : "";
-            return `
-              <article class="release-card">
-                <div class="release-head">
-                  <span class="release-tag">${escapeHtml(rel.tag_name)}</span>
-                  ${idx === 0 ? '<span class="live-pill">LATEST</span>' : `<span class="release-date">${dateStr}</span>`}
-                </div>
-                <div class="release-notes">${formatReleaseBody(rel.body)}</div>
-                <a class="release-link" href="${rel.html_url}" target="_blank" rel="noopener">
-                  ${currentLang === "id" ? "Lihat detail di GitHub →" : "View release on GitHub →"}
-                </a>
-              </article>
-            `;
-          }).join("");
-        }
+        state.releasesStatus = "ready";
       } catch (e) {
-        btn.href = `https://github.com/saferill/HiFi/releases/latest/download/androidApp-${abi}-release.apk`;
-        info.textContent = `Arsitektur terdeteksi: ${abi}`;
-        changelogGrid.innerHTML = `<div class="release-card"><a class="release-link" href="https://github.com/saferill/HiFi/releases" target="_blank" rel="noopener">Buka GitHub Releases →</a></div>`;
+        console.error("[HiFi-web] Failed to load GitHub releases:", e);
+        state.releasesStatus = "error";
+        state.releasesErrorType = e && e.isRateLimit ? "rate_limit" : "network";
       }
-    })();
+      renderHero();
+      renderDesktop();
+      renderChangelog();
+    }
 
-    // Live Radio & Charts Explorer with Search Filter
-    (async function () {
-      let allStations = [];
-      let allCharts = [];
-
-      function renderRadios(q = "") {
-        const term = q.trim().toLowerCase();
-        const filtered = term
-          ? allStations.filter(s => (`${s.title} ${s.subtitle || ""}`).toLowerCase().includes(term))
-          : allStations;
-        const rList = document.getElementById("radio-list");
-        rList.innerHTML = filtered.length
-          ? filtered.map(st => `
-              <div class="list-item">
-                <div class="list-item-text">
-                  <strong>${escapeHtml(st.title)}</strong>
-                  <small>${escapeHtml(st.subtitle || "LIVE")}</small>
-                </div>
-                <div class="list-actions">
-                  <a class="action-pill action-hifi" href="hifi://watch?v=${encodeURIComponent(st.videoId)}" title="Buka di aplikasi HiFi">▶ HiFi</a>
-                  <a class="action-pill action-yt" href="https://www.youtube.com/watch?v=${encodeURIComponent(st.videoId)}" target="_blank" rel="noopener">YouTube</a>
-                </div>
-              </div>
-            `).join("")
-          : `<div class="list-item"><div class="list-item-text"><small>Tidak ada radio yang cocok.</small></div></div>`;
-      }
-
-      function renderCharts(q = "") {
-        const term = q.trim().toLowerCase();
-        const filtered = term
-          ? allCharts.filter(c => (`${c.name} ${c.country || ""} ${c.description || ""}`).toLowerCase().includes(term))
-          : allCharts;
-        const cList = document.getElementById("chart-list");
-        cList.innerHTML = filtered.length
-          ? filtered.map(ch => {
-              let listId = ch.playlistId || "";
-              if (!listId && ch.youtubeUrl) {
-                try { listId = new URL(ch.youtubeUrl).searchParams.get("list") || ""; } catch (e) {}
-              }
-              const hifiBtn = listId
-                ? `<a class="action-pill action-hifi" href="hifi://playlist?list=${encodeURIComponent(listId)}" title="Buka di aplikasi HiFi">▶ HiFi</a>`
-                : "";
-              return `
-                <div class="list-item">
-                  <div class="list-item-text">
-                    <strong>${escapeHtml(ch.name)}</strong>
-                    <small>${escapeHtml(ch.description || (ch.country || "").toUpperCase())}</small>
-                  </div>
-                  <div class="list-actions">
-                    ${hifiBtn}
-                    <a class="action-pill action-yt" href="${ch.youtubeUrl}" target="_blank" rel="noopener">${escapeHtml((ch.country || "YT").toUpperCase())} ↗</a>
-                  </div>
-                </div>
-              `;
-            }).join("")
-          : `<div class="list-item"><div class="list-item-text"><small>Tidak ada chart yang cocok.</small></div></div>`;
-      }
-
-      document.getElementById("radio-search").addEventListener("input", (e) => renderRadios(e.target.value));
-      document.getElementById("chart-search").addEventListener("input", (e) => renderCharts(e.target.value));
+    async function loadRadios() {
+      state.radioStatus = "loading";
+      state.radioErrorType = null;
+      renderRadios();
+      renderStats();
 
       try {
-        const rRes = await fetch("https://raw.githubusercontent.com/saferill/HiFi-files/main/remote-config.json");
-        if (rRes.ok) {
-          const rJson = await rRes.json();
-          allStations = rJson.radioStations || [];
-          document.getElementById("stat-radios").textContent = allStations.length;
-          document.getElementById("radio-count-pill").textContent = `${allStations.length} LIVE`;
-          renderRadios();
+        const res = await fetchWithTimeout("https://raw.githubusercontent.com/saferill/HiFi-files/main/remote-config.json", {
+          cache: "no-cache"
+        });
+        if (!res.ok) {
+          const isRateLimit = res.status === 403 || res.status === 429;
+          throw Object.assign(new Error(`Radio config HTTP ${res.status}`), { isRateLimit });
         }
-      } catch (e) {}
+        const json = await res.json();
+        const list = Array.isArray(json.radioStations) ? json.radioStations : [];
+        state.stations = list;
+        state.radioStatus = list.length > 0 ? "ready" : "empty";
+      } catch (e) {
+        console.error("[HiFi-web] Failed to load radio stations:", e);
+        state.radioStatus = "error";
+        state.radioErrorType = e && e.isRateLimit ? "rate_limit" : "network";
+      }
+      renderRadios();
+      renderStats();
+    }
+
+    async function loadCharts() {
+      state.chartStatus = "loading";
+      state.chartErrorType = null;
+      renderCharts();
+      renderStats();
 
       try {
-        const cRes = await fetch("https://raw.githubusercontent.com/saferill/HiFi-charts/main/api/playlists.json");
-        if (cRes.ok) {
-          const cJson = await cRes.json();
-          allCharts = cJson.data || [];
-          document.getElementById("stat-charts").textContent = allCharts.length;
-          document.getElementById("chart-count-pill").textContent = `${allCharts.length} CHARTS`;
-          renderCharts();
+        const res = await fetchWithTimeout("https://raw.githubusercontent.com/saferill/HiFi-charts/main/api/playlists.json", {
+          cache: "no-cache"
+        });
+        if (!res.ok) {
+          const isRateLimit = res.status === 403 || res.status === 429;
+          throw Object.assign(new Error(`Charts API HTTP ${res.status}`), { isRateLimit });
         }
-      } catch (e) {}
-    })();
+        const json = await res.json();
+        const list = Array.isArray(json.data) ? json.data : [];
+        state.charts = list;
+        state.chartStatus = list.length > 0 ? "ready" : "empty";
+      } catch (e) {
+        console.error("[HiFi-web] Failed to load charts:", e);
+        state.chartStatus = "error";
+        state.chartErrorType = e && e.isRateLimit ? "rate_limit" : "network";
+      }
+      renderCharts();
+      renderStats();
+    }
+
+    document.getElementById("radio-search").addEventListener("input", (e) => {
+      state.radioQuery = e.target.value;
+      renderRadios();
+    });
+    document.getElementById("chart-search").addEventListener("input", (e) => {
+      state.chartQuery = e.target.value;
+      renderCharts();
+    });
+
+    // Boot
+    applyLang(state.lang);
+    resolveDeepLink();
+    detectDeviceArch().then(loadReleases);
+    loadRadios();
+    loadCharts();
   </script>
 </body>
 </html>

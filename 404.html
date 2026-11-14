@@ -3,23 +3,266 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Membuka HiFi [HI-RES]...</title>
+  <meta name="robots" content="noindex" />
+  <title>HiFi [HI-RES]</title>
+  <style>
+    :root {
+      --bg: #080a0f;
+      --card: #131824;
+      --border: #222b3d;
+      --primary: #7cc4fa;
+      --text: #f3f5f8;
+      --muted: #98a2b3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 26px;
+      max-width: 440px;
+      width: 100%;
+    }
+    h1 { font-size: 1.4rem; font-weight: 900; margin-bottom: 10px; }
+    p { color: var(--muted); font-size: 0.94rem; line-height: 1.55; }
+    .actions {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 18px;
+      border-radius: 11px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--primary); color: #061320; }
+    .btn-secondary { background: #0f131c; color: var(--text); border: 1px solid var(--border); }
+    .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <h1 id="title">HiFi [HI-RES]</h1>
+    <p id="status"></p>
+    <div class="actions" id="actions"></div>
+  </main>
+
   <script>
-    (function() {
-      const path = window.location.pathname.replace(/^\/HiFi-web/, "");
-      const search = window.location.search || "";
-      if (path.startsWith("/app/")) {
-        const sub = path.replace(/^\/app\//, "");
-        window.location.href = "HiFi://" + sub + search;
+    (function () {
+      "use strict";
+
+      var APP_LINK_PATHS = new Set([
+        "notification", "watch", "playlist", "channel", "c",
+        "album", "library", "analytics", "taste"
+      ]);
+      var WATCH_ALIASES = new Set(["track", "song", "video", "v"]);
+      var DOWNLOAD_URL = "https://saferill.github.io/HiFi-web/?from=deeplink";
+      var HOME_PATH = "/HiFi-web/";
+
+      var isId = (navigator.language || "id").toLowerCase().startsWith("id");
+      document.documentElement.lang = isId ? "id" : "en";
+
+      var T = isId ? {
+        openingTitle: "Membuka HiFi…",
+        openingStatus: "Mengalihkan ke aplikasi HiFi. Jika aplikasi belum terpasang, halaman unduh akan terbuka otomatis.",
+        fallbackStatus: "Aplikasi tidak terdeteksi — membuka halaman unduh…",
+        retryBtn: "Coba buka ulang aplikasi",
+        downloadBtn: "Unduh Aplikasi HiFi",
+        notFoundTitle: "404 — Halaman Tidak Ditemukan",
+        notFoundStatus: "Tautan yang kamu buka tidak tersedia atau format deep-link tidak dikenali.",
+        homeBtn: "Ke Halaman Utama",
+        repoBtn: "Buka GitHub HiFi"
+      } : {
+        openingTitle: "Opening HiFi…",
+        openingStatus: "Redirecting to the HiFi app. If it is not installed, the download page will open automatically.",
+        fallbackStatus: "App not detected — opening download page…",
+        retryBtn: "Try opening app again",
+        downloadBtn: "Download HiFi App",
+        notFoundTitle: "404 — Page Not Found",
+        notFoundStatus: "The link you followed does not exist or the deep-link format is not supported.",
+        homeBtn: "Go to Homepage",
+        repoBtn: "View HiFi on GitHub"
+      };
+
+      function isValidArg(val) {
+        return typeof val === "string" && val.length > 0 && val.length <= 128 && !/[\x00-\x1f\s]/.test(val);
       }
+
+      function encodeParams(pairs) {
+        if (!pairs.length) return "";
+        return "?" + pairs.map(function (kv) {
+          return encodeURIComponent(kv[0]) + "=" + encodeURIComponent(kv[1]);
+        }).join("&");
+      }
+
+      function resolveAppDeepLink(pathname, search) {
+        var stripped = pathname.replace(/^\/HiFi-web(?=\/|$)/, "");
+        if (!stripped.startsWith("/app/")) return null;
+
+        var rawRest = stripped.slice("/app/".length);
+        var parts = rawRest.split("/").filter(Boolean).map(function (seg) {
+          try { return decodeURIComponent(seg); } catch (e) { return seg; }
+        });
+        if (!parts.length) return null;
+
+        var head = parts[0].toLowerCase();
+        var tail = parts.slice(1);
+        var incoming = new URLSearchParams(search || "");
+        var queryPairs = [];
+        var appPath = "";
+        var pathSegs = [];
+
+        if (WATCH_ALIASES.has(head)) {
+          appPath = "watch";
+          var vParam = incoming.get("v");
+          var segId = tail[0] || "";
+          var videoId = isValidArg(vParam) ? vParam : (isValidArg(segId) ? segId : "");
+          if (!videoId) return null;
+          queryPairs.push(["v", videoId]);
+          incoming.forEach(function (val, key) {
+            if (key !== "v") queryPairs.push([key, val]);
+          });
+        } else if (head === "playlist" && tail.length > 0 && !incoming.has("list")) {
+          appPath = "playlist";
+          if (!isValidArg(tail[0])) return null;
+          queryPairs.push(["list", tail[0]]);
+          incoming.forEach(function (val, key) {
+            queryPairs.push([key, val]);
+          });
+        } else if (APP_LINK_PATHS.has(head)) {
+          appPath = head;
+          pathSegs = tail.filter(isValidArg);
+          if ((head === "channel" || head === "c" || head === "album") && pathSegs.length === 0 && !incoming.toString()) {
+            return null;
+          }
+          if (head === "watch" && incoming.has("v")) {
+            var qv = incoming.get("v");
+            if (!isValidArg(qv)) return null;
+            queryPairs.push(["v", qv]);
+            incoming.forEach(function (val, key) {
+              if (key !== "v") queryPairs.push([key, val]);
+            });
+          } else {
+            incoming.forEach(function (val, key) {
+              queryPairs.push([key, val]);
+            });
+          }
+        } else {
+          return null;
+        }
+
+        var encodedSegs = pathSegs.map(encodeURIComponent).join("/");
+        var target = appPath + (encodedSegs ? "/" + encodedSegs : "") + encodeParams(queryPairs);
+        return {
+          target: target,
+          appUri: "HiFi://" + target
+        };
+      }
+
+      function isAndroidIntentBrowser() {
+        var ua = navigator.userAgent || "";
+        return /Android/i.test(ua) && /(Chrome|EdgA|Firefox|SamsungBrowser)/i.test(ua);
+      }
+
+      function buildLaunchUri(resolved) {
+        if (isAndroidIntentBrowser()) {
+          return "intent://" + resolved.target +
+            "#Intent;scheme=hifi;package=com.hifi.music;S.browser_fallback_url=" +
+            encodeURIComponent(DOWNLOAD_URL) + ";end";
+        }
+        return resolved.appUri;
+      }
+
+      var titleEl = document.getElementById("title");
+      var statusEl = document.getElementById("status");
+      var actionsEl = document.getElementById("actions");
+      var resolved = resolveAppDeepLink(window.location.pathname, window.location.search);
+
+      if (!resolved) {
+        document.title = T.notFoundTitle;
+        titleEl.textContent = T.notFoundTitle;
+        statusEl.textContent = T.notFoundStatus;
+
+        var homeLink = document.createElement("a");
+        homeLink.className = "btn btn-primary";
+        homeLink.href = HOME_PATH;
+        homeLink.textContent = T.homeBtn;
+
+        var repoLink = document.createElement("a");
+        repoLink.className = "btn btn-secondary";
+        repoLink.href = "https://github.com/saferill/HiFi";
+        repoLink.rel = "noopener";
+        repoLink.textContent = T.repoBtn;
+
+        actionsEl.appendChild(homeLink);
+        actionsEl.appendChild(repoLink);
+        return;
+      }
+
+      var launchUri = buildLaunchUri(resolved);
+      document.title = T.openingTitle;
+      titleEl.textContent = T.openingTitle;
+      statusEl.textContent = T.openingStatus;
+
+      var retryLink = document.createElement("a");
+      retryLink.className = "btn btn-primary";
+      retryLink.href = launchUri;
+      retryLink.textContent = T.retryBtn;
+
+      var dlLink = document.createElement("a");
+      dlLink.className = "btn btn-secondary";
+      dlLink.href = DOWNLOAD_URL;
+      dlLink.textContent = T.downloadBtn;
+
+      actionsEl.appendChild(retryLink);
+      actionsEl.appendChild(dlLink);
+
+      if (isAndroidIntentBrowser()) {
+        window.location.href = launchUri;
+        return;
+      }
+
+      var fallbackTimer = null;
+      function cancelFallback() {
+        if (fallbackTimer !== null) {
+          clearTimeout(fallbackTimer);
+          fallbackTimer = null;
+        }
+      }
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") cancelFallback();
+      });
+      window.addEventListener("pagehide", cancelFallback);
+
+      fallbackTimer = setTimeout(function () {
+        if (document.visibilityState === "visible" && document.hasFocus()) {
+          statusEl.textContent = T.fallbackStatus;
+          window.location.href = DOWNLOAD_URL;
+        }
+      }, 1200);
+
+      window.location.href = launchUri;
     })();
   </script>
-  <meta http-equiv="refresh" content="2;url=/HiFi-web/" />
-</head>
-<body style="background:#0b0d12;color:#f3f5f8;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;">
-  <div>
-    <h2>Mengarahkan ke Aplikasi HiFi...</h2>
-    <p style="margin-top:12px;"><a href="/HiFi-web/" style="color:#7cc4fa;">Klik di sini jika belum memiliki aplikasi HiFi</a></p>
-  </div>
 </body>
 </html>
